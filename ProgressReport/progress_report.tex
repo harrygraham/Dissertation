@@ -1,0 +1,107 @@
+% Note: this file can be compiled on its own, but is also included by
+% diss.tex (using the docmute.sty package to ignore the preamble)
+\documentclass[12pt,a4paper,twoside]{article}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage[margin=25mm]{geometry}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+	\noindent
+	\begin{minipage}[t][][t]{0.5\textwidth}
+		\includegraphics[width=40mm]{CamLogo.jpg}
+	\end{minipage}
+	\begin{minipage}{0.5\textwidth}
+	\begin{flushright}
+		\large
+		\textit{Harry Graham}
+		\\
+		\textit{Christ's College}
+		\\
+		\texttt{hg402}
+	\end{flushright}
+	\end{minipage}
+	
+	\begin{center}
+	\vspace{6cm}
+	{\sc\large Computer Science Tripos - Part II Project Progress Report \par}
+	\vspace{0.5cm}
+	{\huge\bf Deep Learning Techniques for Credit Card Fraud Detection\par}
+	\vspace{0.5cm}
+	{\huge\bf Progress Report\par}
+	\vspace{0.5cm}
+	{\large February 20, 2018 \par}
+	\end{center}
+	
+	\vfill
+	
+	\begin{flushleft}
+		\textbf{Project Supervisor:} Dr M.~Jamnik \& B.~Dimanov
+		
+		\textbf{Project Originator:}  H.~Graham \& B.~Dimanov
+
+		\textbf{Director of Studies:}  Dr R.~Mortier
+
+		\textbf{Project Overseers:} Dr S.~B.~Holden  \& Dr N.~R.~Krishnaswami
+	\end{flushleft}
+	
+	\vspace{1.5cm}
+\end{titlepage}
+
+% Main document
+\section*{Summary}
+So far the project is on schedule, as set out by the project proposal document. Some of the michaelmas term work was done ahead of schedule which compensated for other parts of the work that took longer than expected. I have also briefly started work on the second CNN model which was planned mainly for the start of Lent term. 
+
+ \section*{Work Done}
+ 
+ \begin{itemize}
+ \item Experiments with sampling techniques \\
+ -- I experimented with under-sampling, random oversampling and SMOTE methods. I used a linear regression classifier.
+ \item Implemented custom cross validation \\
+ -- I created a custom cross-val method, as built in library functions do not provide enough granularity for the project's interests. This was to ensure no overfitting and to correctly ensure that we resample the data during cross validation in a systematic way.
+ \item Experiments relating to systematic training and testing of classifiers \\
+ -- I researched and experimented thoroughly the effects of test results when oversampling before and during cross validation. 
+ \item Baseline models implemented and summarised \\
+ -- I have collated results for the baseline models, for the metrics described in the proposal document and F1 score.
+ \item First CNN model implemented and trained \\
+ -- I have created the first CNN model whereby the input shape of the network is the length of the vectors by 1 and the kernel size is also the length of the vectors. So in this case (29,1) and 29 respectively. I have trained this model and collated results.
+ 
+ \item Scaffolding for second CNN model created \\
+ -- The outline of the second CNN model has been implemented, ready to do any data preprocessing needed and to train it. This is the model whereby principally we pass in batches of 100 vectors into the network, input shape (29,100) and the kernel size is (29,5) with a stride of 1, striding over the data in a vertical dimension of 2-D space to exploit temporal ordering. 
+ \item Rough plans for GAN work have been established \\
+ -- I have thought about how to approach this portion of the work.  
+ \end{itemize}
+ 
+ \section*{Work to be Done}
+ 
+ Work to be done is set out in the project proposal document. This includes:
+  \begin{itemize}
+ \item Data preprocessing and training second CNN model \\
+ -- I need to pad my data to ensure that the network is happy with the input shape, that is to say that there are multiples of 100 for each batch. I then need to train to model to retreive results. This however will need care when cross validating because this is now a time series style data and so we want to do CV appropriate to this sequence, by looking systematically at future data points and not random old data points, like other CV functions do. 
+ 
+ \item Summarising CNN work \\
+ -- Summarise results of both CNN models and draw comparisons from each, as detailed in the proposal document.
+ \item Implement GAN network model and training \\
+ -- As described in proposal
+ \item Extension work if time permits \\
+ -- As described in proposal
+ \end{itemize}
+  
+ \section*{Difficulties}
+ 
+ There have not been significant difficulties in completing the work thus far. The time to setup project work took longer than expected and experimentation with libraries (for example gpu use in tensorflow and setting up virtual environments) also ate more time than estimated. 
+ 
+ A small problem that occurred is library functions for cross validation not being enough for the work being done and so I had to implement my own custom cross validation based on what I wanted to get out of it. For example retrieving more complex scoring data from the CV function and also ensuring that we are oversampling correctly and not overfitting. 
+ 
+ 
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+
+\end{document}
