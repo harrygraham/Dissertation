@@ -36,7 +36,7 @@
 	\vspace{0.5cm}
 	{\huge\bf Progress Report\par}
 	\vspace{0.5cm}
-	{\large February 20, 2018 \par}
+	{\large February 2, 2018 \par}
 	\end{center}
 	
 	\vfill
@@ -83,7 +83,7 @@ So far the project is on schedule, as set out by the project proposal document. 
  Work to be done is set out in the project proposal document. This includes:
   \begin{itemize}
  \item Data preprocessing and training second CNN model \\
- -- I need to pad my data to ensure that the network is happy with the input shape, that is to say that there are multiples of 100 for each batch. I then need to train to model to retreive results. This however will need care when cross validating because this is now a time series style data and so we want to do CV appropriate to this sequence, by looking systematically at future data points and not random old data points, like other CV functions do. 
+ -- I need to pad my data to ensure that the network is happy with the input shape, that is to say that there are multiples of 100 for each batch. I then need to train the model to retreive results. This however will need care when cross validating because this is now a time series style data and so we want to do CV appropriate to this sequence, by looking systematically at future data points and not random old data points, like other CV functions do. 
  
  \item Summarising CNN work \\
  -- Summarise results of both CNN models and draw comparisons from each, as detailed in the proposal document.
@@ -97,7 +97,7 @@ So far the project is on schedule, as set out by the project proposal document. 
  
  There have not been significant difficulties in completing the work thus far. The time to setup project work took longer than expected and experimentation with libraries (for example gpu use in tensorflow and setting up virtual environments) also ate more time than estimated. 
  
- A small problem that occurred is library functions for cross validation not being enough for the work being done and so I had to implement my own custom cross validation based on what I wanted to get out of it. For example retrieving more complex scoring data from the CV function and also ensuring that we are oversampling correctly and not overfitting. 
+ An unforeseen workload was library functions for cross validation not being enough for the work being done and so I had to implement my own cross validation (Based on standard Kfold in SKLearn) in order to achieve the project's needs. For example retrieving more complex scoring data from the CV function and also ensuring that we are oversampling correctly inside the cross validation loop and not overfitting. The work was a result of research and experimentation and although was not something foreseen at the time of project proposal, was a good learning experience.
  
  
 
