@@ -1,0 +1,121 @@
+\documentclass[12pt,a4paper,twoside]{report}
+\usepackage[pdfborder={0 0 0}]{hyperref}
+\usepackage[margin=25mm]{geometry}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+% For temporarily splitting the document into multiple columns
+\usepackage{multicol}
+
+% Command for extracting the word count.
+\newcommand\wordcount{\input{word.count}}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+	\noindent
+	\begin{minipage}[t][][t]{0.5\textwidth}
+		\includegraphics[width=40mm]{CamLogo.jpg}
+	\end{minipage}
+	\begin{minipage}{0.5\textwidth}
+	\begin{flushright}
+		\large
+		\textit{Harry Graham}
+		\\
+		\textit{Christ's College}
+		\\
+		\texttt{hg402}
+	\end{flushright}
+	\end{minipage}
+	
+	\begin{center}
+	\vspace{6cm}
+	{\sc\large Computer Science Tripos - Part II Project\par}
+	\vspace{0.5cm}
+	{\huge\bf Deep Learning Techniques for Credit Card Fraud Detection\par}
+	\vspace{0.5cm}
+	{\large May 18, 2018 \par}
+	\end{center}
+
+\end{titlepage}
+
+\pagestyle{plain}
+
+\section*{\huge Proforma}
+\vspace{0.5cm}
+{\large
+\begin{tabular}{ll}
+Name:               & \bf Harry Graham \\
+College:            & \bf Christ's College \\
+Project Title:      & \bf Deep Learning Techniques for Credit Card Fraud \\
+			 & \bf Detection \\
+Examination:        & \bf Computer Science Tripos -- Part II, June 2018 \\
+Word Count:         &  \\
+Project Originators: & H.~Graham \& B.~Dimanov \\
+Supervisors:         & Dr M.~Jamnik \& B.~Dimanov 
+\end{tabular}
+}
+
+\section*{Original Aims of the Project}
+The primary aim of the project was to implement and compare some deep learning techniques, alongside some baseline models, for credit card fraud detection (CCFD). More specifically, I aimed to experiment with two popular types of architecture, namely Convolutional Neural Networks (CNNs)  \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs). These have been successful in the image classification space and the aim of this project was to shed light on their use in the credit card fraud space. This kind of experimentation of predominantly image-based models, on single dimensional, time-series data is a relatively novel approach for CCFD.
+
+\section*{Work Completed}
+All of the core project aims set out in the proposal have been met, meaning results have been collated and evaluated across the three main components of the project: Baseline Models, CNN methods and GAN methods. 
+I have also gone on to do some extension work relating to further investigation on the models I have experimented with. This is in the form of parameter tuning and further analysis not originally set out in the project proposal.
+
+\section*{Special Difficulties}
+None.
+
+
+\newpage
+\section*{Declaration}
+
+I, Harry Graham of Christ's College, being a candidate for Part II of the Computer Science Tripos, hereby declare that this dissertation and the work described in it are my own work, unaided except as may be specified below, and that the dissertation does not contain material that has already been used to any substantial extent for a comparable purpose.
+
+\vspace{1cm}
+\begin{multicols}{2}
+
+\rule{5cm}{0.15mm} \\
+\leftline{\scshape{Signed}}
+
+\columnbreak
+
+\rule{5cm}{0.15mm} \\
+\leftline{\scshape{Date}}
+
+\end{multicols}
+
+
+\tableofcontents
+
+\pagestyle{headings}
+
+\chapter{Introduction}
+
+\chapter{Preparation}
+
+\chapter{Implementation}
+
+\chapter{Evaluation}
+
+\chapter{Conclusions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% the bibliography
+\newpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+
+
+
+
+
