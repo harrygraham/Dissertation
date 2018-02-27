@@ -92,7 +92,15 @@ I, Harry Graham of Christ's College, being a candidate for Part II of the Comput
 
 \tableofcontents
 
-\pagestyle{headings}
+\pagestyle{headings} % TODO: fancyhdr - make chapter name -- section appear in headers
+
+%%
+%\usepackage{fancyhdr}
+%\pagestyle{fancy}
+%\fancyhf{} % clear the headers
+%
+%\fancyfoot[L]{\thechapter \thesection}
+%%
 
 \chapter{Introduction}
 
@@ -106,7 +114,32 @@ I first explore a set of baseline classifiers, which are primarily a handful of 
 
 Then the project shifts to experimenting with Convolutional Neural Networks (CNNs) \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs) \cite{2014arXiv1406.2661G}.  
 
-\chapter{Preparation}
+\chapter{Preparation} \label{preparation}
+
+\section{Software Engineering}
+
+This section details the project requirements and early design decisions that were made.
+
+\subsection{Tools and Technologies Used} \label{tools}
+
+Below I describe and justify where necessary the tools and technologies that I used.
+
+\subsubsection{Version Control and Project Tools}
+
+I hosted my project in a repository on GitHub\footnote{\href{https://github.com/harrygraham/DeepLearning-CreditCardFraud}{https://github.com/harrygraham/DeepLearning-CreditCardFraud}}, used Git for version control, and used virtual environments with pip for project package management and requirements.
+
+I made heavy use of Jupyter Notebooks for writing code in an experimental manner, with immediate execution and feedback. 
+
+I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work and SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
+
+\subsubsection{Languages}
+
+My project was entirely written in Python, using the libraries and APIs described previously. This is mainly due to the large ecosystem and documentation surrounding these machine learning libraries in python and also for the ease of use of tools such as Jupyter Notebooks for experimentation.
+
+\subsection{Starting Point}
+
+My project codebase was written from scratch, with the assistance of the tools and libraries mentioned above. Apart from a basic knowledge
+
 
 \chapter{Implementation}
 
