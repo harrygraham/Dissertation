@@ -6,6 +6,11 @@
 \usepackage{enumerate}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{float}
+\graphicspath{ {Images/} }
+
+
 
 % For temporarily splitting the document into multiple columns
 \usepackage{multicol}
@@ -92,15 +97,7 @@ I, Harry Graham of Christ's College, being a candidate for Part II of the Comput
 
 \tableofcontents
 
-\pagestyle{headings} % TODO: fancyhdr - make chapter name -- section appear in headers
-
-%%
-%\usepackage{fancyhdr}
-%\pagestyle{fancy}
-%\fancyhf{} % clear the headers
-%
-%\fancyfoot[L]{\thechapter \thesection}
-%%
+\pagestyle{headings} 
 
 \chapter{Introduction}
 
@@ -116,13 +113,88 @@ Then the project shifts to experimenting with Convolutional Neural Networks (CNN
 
 \chapter{Preparation} \label{preparation}
 
+
+\section{Convolutional Neural Networks}
+\section{Generative Adversarial Networks}
+GAN is a framework proposed by Ian Goodfellow, Yoshua Bengio and others in 2014. The idea is that we have two networks: a generator and a discriminator. The generator network tries to produce,  from random noise,  data in the form of the training data we want. This could be an image, in the common use-case, or in this one, a fraudulent transaction vector. The discriminator, takes in real-life data (from the training set) and also the generated data from the generator network. The discriminator tries to determine whether the current input is real or generated. Effectively these two networks play a game with each other: the generator tries to fool the discriminator whilst the discriminator tries to catch out the generator. This continues until each network doesn't get any better and the GAN stabilises. Figure 2.1 represents an overview of a GAN network.
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[width=\textwidth]{GAN-Overview}
+\caption{Overview of a GAN network}
+\end{figure}
+
+Mathematically, we can define the following quantities:
+
+$$X_{x\sim p_\text{data}(x)} = \text{Sample from distribution of real data} $$
+$$Z_{z\sim p_\text{z}(x)} = \text{Sample from distribution of generated data} $$
+$$G(z) = \text{Generator Network}$$
+$$D(x) = \text{Discriminator Network}$$
+The process of training for a GAN is like a min-max game between the two networks, and can thus be represented by the following value cost function:
+$$\min _ { G } \max _ { D } V ( D ,G )$$
+where 
+$$V ( D ,G ) = \mathbb { E } _ { x \sim p _ { d a t a } ( x ) } [ \log D ( x ) ] + \mathbb { E } _ { z \sim p _ { z } ( z ) }[ \log ( 1- D ( G ( z ) ) ] $$
+The first term in this equation represents the quantity of the real-distributed data passed through the discriminator network. The discriminator tries to maximise this such that $D(x)\rightarrow 1$. The second term represents generated data passed through the discriminator. The generator tries to minimise such that $D(G(z))\rightarrow 1$ (i.e the discriminator is fooled by the generated sample).
+
+The steps for training a GAN can be outlined as followed:
+\begin{enumerate}[Step 1:]
+  \item 
+  \begin{enumerate}
+  \item Take a batch of real data and train discriminator to correctly predict them as real
+  \item Take a batch of generated data and train discriminator to correctly predict them as fake
+\end{enumerate}
+  
+  \item Freeze the training of the discriminator network
+  \item Generate a batch of fake data and use the frozen discriminator to train the generator
+  \item Repeat the above for n epochs until neither network makes any further improvments
+\end{enumerate}
+
+In summary, we alternate between training of the discriminator to correctly determine real or fake data and training the generator on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
+
+\section{Machine Learning Evalutation Practises}
+\subsection{Cross-validation}
+
+
 \section{Software Engineering}
 
 This section details the project requirements and early design decisions that were made.
 
+\subsection{Requirements}
+The main success criteria of the project is outlined as follows:
+
+\begin{enumerate}
+   \item Baseline Models
+   \begin{itemize}
+     \item Compare a handful of supervised learning classifiers, from SciKit-Learn.
+     \item Using metrics described in the Evaluation section of the project.
+     \item Experiment with resampling techniques. 
+     \item Implement appropriate cross-validation.
+   \end{itemize}
+   \item CNN Models
+   \begin{itemize}
+     \item Implement CNN version 1 - Single vector input approach.
+     \item Implement CNN version 2 - Time series, sliding image window approach.
+   \end{itemize}
+   \item GAN Models
+   \begin{itemize}
+     \item Implement GAN version 1 - Dense generator network.
+     \item Implement GAN version 2 - Using a CNN model from previous work as the generator network.
+     \item Experiment with how GAN is used and how it performs on the data.
+   \end{itemize}
+\end{enumerate}
+
+ These were all done more or less in order. Some work overlapped, namely work on auxiliary functionality to allow appropriate cross validation or data preparation etc. More details on specifics is outlined in the implementation chapter. 
+  
 \subsection{Tools and Technologies Used} \label{tools}
 
 Below I describe and justify where necessary the tools and technologies that I used.
+
+\subsubsection{Machine Learning}
+
+I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work and SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
+
+The reasons for these choices were a mixture of good documentation, popularity \& ease-of-use. Using a TensorFlow backend meant that I could use GPU acceleration if needed. I used Keras as a TensorFlow wrapper, so I could avoid writing models completely from scratch but still giving me the flexibility to develop around models and customise to a large extent. Similarly with SciKit-Learn, which has a lot of helpful utility functions for evaluating models and processing data.
 
 \subsubsection{Version Control and Project Tools}
 
@@ -130,7 +202,6 @@ I hosted my project in a repository on GitHub\footnote{\href{https://github.com/
 
 I made heavy use of Jupyter Notebooks for writing code in an experimental manner, with immediate execution and feedback. 
 
-I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work and SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
 
 \subsubsection{Languages}
 
@@ -138,12 +209,22 @@ My project was entirely written in Python, using the libraries and APIs describe
 
 \subsection{Starting Point}
 
-My project codebase was written from scratch, with the assistance of the tools and libraries mentioned above. Apart from a basic knowledge
+My project codebase was written from scratch, with the assistance of the tools and libraries mentioned above. Apart from a basic knowledge of supervised learning covered by the part IB Artificial Intelligence course, I had to learn about most of the models and best practises myself, through thorough reading around the topics. 
+In terms of technologies, I had little prior experience with SKLearn and Keras/TensorFlow. I had significant experience in Python, however, from a summer internship in industry as well as experience with Git.
 
 
 \chapter{Implementation}
+\section{Models Overview}
+\section{Baseline Models}
+\section{Convolutional Neural Network Models}
+\section{Generative Adversarial Network Models}
 
 \chapter{Evaluation}
+\section{Evaluation Methodology}
+\subsection{Metrics}
+\subsection{Visual Inspections}
+
+\section{Results Overview}
 
 \chapter{Conclusions}
 
