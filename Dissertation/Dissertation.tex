@@ -9,6 +9,7 @@
 \usepackage{amsfonts}
 \usepackage{float}
 \graphicspath{ {Images/} }
+\usepackage{subcaption}
 
 
 
@@ -115,6 +116,39 @@ Then the project shifts to experimenting with Convolutional Neural Networks (CNN
 
 
 \section{Convolutional Neural Networks}
+Convolutional Neural Networks are a class of deep artificial neural networks, that have seen success in image recognition and other computer vision areas. Unlike typical neural networks, CNNs exploit spatial locality by shared weights. 
+
+A CNN typically consists of an input layer, multiple hidden layers and an output layer. Hidden layers are usually convolutional layers, pooling layers and normalisation layers. 
+
+\textbf{Convolutional Layer:}\\
+A Convolutional Layer can take many parameters, the most prominent though are: 
+\begin{enumerate}
+  \item Input shape
+  \item Kernel size
+  \item Number of filters
+  \item Stride size
+\end{enumerate}
+
+The \textbf{kernel size} defines the size of the filter that will be moved over the input shape, shifting by an amount defined by \textbf{stride size}. The \textbf{number of filters} simply defines how many separate filters we initialise and convolve with the input, to give multiple outputs. Convolving a filter with an input is essentially taking the dot product of all overlapping cells between the input and the filter, thus producing a single value in the output shape. 
+
+This can be visualised with an example as follows:\\
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[width=\textwidth]{CNN-Example}
+\caption{Example of a CNN network}
+\end{figure}
+
+We see here that in the first convolutional layer, the input shape is 24x24 and the kernel size is 5x5, which strides over the input shape to produce 4x(20x20) shapes. Here the number of filters was 4, which is why 4 outputs have been produced. Also, typically the stride size is 1. In this 24x24 input, with a 5x5 filter we can have $(24-5+1)$ possible positions of the filter in one direction. 
+
+\textbf{Subsampling / Pooling:}\\
+Subsampling is essentially taking the average across a group of cells to produce a smaller shape. This therefore produces the same number of 'feature maps' but smaller in size. 
+
+\textbf{Fully Connected Layers:}\\
+Fully Connected Layers (FCs) take all the feature maps from a convolutional layer and stack them all together in a traditional neural network in which every node is connected to every other node (fully connected). This then allows the network to learn the relationships between small parts of the image (or input in general) on a fine grained level. 
+
+
 \section{Generative Adversarial Networks}
 GAN is a framework proposed by Ian Goodfellow, Yoshua Bengio and others in 2014. The idea is that we have two networks: a generator and a discriminator. The generator network tries to produce,  from random noise,  data in the form of the training data we want. This could be an image, in the common use-case, or in this one, a fraudulent transaction vector. The discriminator, takes in real-life data (from the training set) and also the generated data from the generator network. The discriminator tries to determine whether the current input is real or generated. Effectively these two networks play a game with each other: the generator tries to fool the discriminator whilst the discriminator tries to catch out the generator. This continues until each network doesn't get any better and the GAN stabilises. Figure 2.1 represents an overview of a GAN network.
 
@@ -153,7 +187,63 @@ The steps for training a GAN can be outlined as followed:
 In summary, we alternate between training of the discriminator to correctly determine real or fake data and training the generator on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
 
 \section{Machine Learning Evalutation Practises}
+Here I describe some of the main machine learning evaluation concepts that I had to have a clear idea of, prior to implementation of this project. 
+
+\subsection{Train and Test Splits}
+Let's say we have \textbf{\textit{m}} examples $ \mathbf { x } _ { 1} ,\mathbf { x } _ { 2} ,\dots ,\mathbf { x } _ { m }$ each in $\mathbb { R } ^ { n }$. In a supervised learning problem, we also have \textbf{\textit{m}} labels $\left\{ y _ { 1} ,y _ { 2} ,\dots ,y _ { m } \right\}$ in a set \textbf{\textit{Y}}.\\
+In machine learning we wish to find a hypothesis $h : \mathbb { R } ^ { n } \rightarrow Y$ that is defined by a vector of weights \textbf{\textit{w}}. It is then common to write $h _ { w } ( x )$.\\
+
+We define a training set as $\mathbf{s} = [(\mathbf { x } _ { 1}, \mathbf { y } _ { 1}),(\mathbf { x } _ { 2}, \mathbf { y } _ { 2}),\dots,(\mathbf { x } _ { m}, \mathbf { y } _ { m})]$.
+ 
+When training a model, to try and achieve our $h _ { w } ( x )$, we use data from the training set. When we train a model, it will often report some metrics or loss function to reflect how the performance increased during the training process. 
+
+The problem with this however is that our model may not perform well on \textbf{unseen} data. In other words, it might not \textbf{generalise} well. To overcome this, it is good practise to preserve a testing portion of the data, called the test set, that is not used in the training process. The test set is then used to evaluate how the model performs after training. 
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[scale=0.8]{train-test-split}
+\caption{A 70:30 train test split of data}
+\end{figure}
+
 \subsection{Cross-validation}
+
+Cross-validation takes this a step further. The hypothesis of our model may in fact generalise and perform better on some portions of the data over others and thus performing just one split, may not give the most confident results. Also, when performing these train-test splits, the element of randomness in the split can work against us as even if we average this process say 3 times, it is likely that there is some overlap in the runs and we are not really using the data available to its full capacity. 
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[scale=0.8]{cross-val}
+\caption{K-Fold Cross Validation}
+\end{figure}
+
+\subsection{Resampling Methods}
+
+\subsubsection{Cross-validating Correctly}
+When employing oversampling techniques, this completely affects the way we handle cross-validation. It no longer is valid to simple oversample the dataset and then perform cross-validation. The reason for this is the potential of overfitting. Figure~\ref{fig:oversample-before} shows what can happen in this situation. Inside the cross-validation loop, the current train-test folds split means that some of the oversampled minority class (node 3) that was portioned into the test set is also in the training set. This means that our model would have seen this data during the training process and will therefore have a bias during the testing and evaluation phase as it already knows how to classify this data. 
+
+It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Then, for every iteration of the loop, we split the data into train-test first and then oversample the training data fold only. This preserves the testing fold, keeping a portion of the original dataset untouched, for evaluation. This is a lot more effective in testing the generalisability of a model.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{oversample-before}
+\caption{Oversampling OUTSIDE the cross-val loop}
+\label{fig:oversample-before}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{oversample-after-1}
+\caption{Oversampling INSIDE the cross-val loop [n=1]}
+\label{fig:oversample-after-1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{oversample-after-2}
+\caption{Oversampling INSIDE the cross-val loop [n=2]}
+\label{fig:oversample-after-2}
+\end{figure}
 
 
 \section{Software Engineering}
