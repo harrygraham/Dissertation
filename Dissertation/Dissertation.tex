@@ -62,7 +62,7 @@ Project Title:      & \bf Deep Learning Techniques for Credit Card Fraud \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2018 \\
 Word Count:         &  \\
 Project Originators: & H.~Graham \& B.~Dimanov \\
-Supervisors:         & Dr M.~Jamnik \& B.~Dimanov 
+Supervisors:         & B.~Dimanov \& Dr M.~Jamnik
 \end{tabular}
 }
 
@@ -113,6 +113,64 @@ I first explore a set of baseline classifiers, which are primarily a handful of 
 Then the project shifts to experimenting with Convolutional Neural Networks (CNNs) \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs) \cite{2014arXiv1406.2661G}.  
 
 \chapter{Preparation} \label{preparation}
+
+\section{Software Engineering}
+
+This section details the project requirements and early design decisions that were made.
+
+\subsection{Requirements}
+The main success criteria of the project is outlined as follows:
+
+\begin{enumerate}
+   \item Baseline Models
+   \begin{itemize}
+     \item Compare a handful of supervised learning classifiers, from SciKit-Learn.
+     \item Using metrics described in the Evaluation section of the project.
+     \item Experiment with resampling techniques. 
+     \item Implement appropriate cross-validation.
+   \end{itemize}
+   \item CNN Models
+   \begin{itemize}
+     \item Implement CNN version 1 - Single vector input approach.
+     \item Implement CNN version 2 - Time series, sliding image window approach.
+   \end{itemize}
+   \item GAN Models
+   \begin{itemize}
+     \item Implement GAN version 1 - Dense generator network.
+     \item Implement GAN version 2 - Using a CNN model from previous work as the generator network.
+     \item Experiment with how GAN is used and how it performs on the data.
+   \end{itemize}
+\end{enumerate}
+
+ These were all done more or less in order. Some work overlapped, namely work on auxiliary functionality to allow appropriate cross validation or data preparation etc. More details on specifics is outlined in the implementation chapter. 
+  
+\subsection{Tools and Technologies Used} \label{tools}
+
+Below I describe and justify where necessary the tools and technologies that I used.
+
+\subsubsection{Machine Learning}
+
+I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work and SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
+
+The reasons for these choices were a mixture of good documentation, popularity \& ease-of-use. Using a TensorFlow backend meant that I could use GPU acceleration if needed. I used Keras as a TensorFlow wrapper, so I could avoid writing models completely from scratch but still giving me the flexibility to develop around models and customise to a large extent. Similarly with SciKit-Learn, which has a lot of helpful utility functions for evaluating models and processing data.
+
+\subsubsection{Version Control and Project Tools}
+
+I hosted my project in a repository on GitHub\footnote{\href{https://github.com/harrygraham/DeepLearning-CreditCardFraud}{https://github.com/harrygraham/DeepLearning-CreditCardFraud}}, used Git for version control, and used virtual environments with pip for project package management and requirements.
+
+I made heavy use of Jupyter Notebooks for writing code in an experimental manner, with immediate execution and feedback. 
+
+
+\subsubsection{Languages}
+
+My project was entirely written in Python, using the libraries and APIs described previously. This is mainly due to the large ecosystem and documentation surrounding these machine learning libraries in python and also for the ease of use of tools such as Jupyter Notebooks for experimentation.
+
+\subsection{Starting Point}
+
+My project codebase was written from scratch, with the assistance of the tools and libraries mentioned above. Apart from a basic knowledge of supervised learning covered by the part IB Artificial Intelligence course, I had to learn about most of the models and best practises myself, through thorough reading around the topics. 
+
+
+In terms of technologies, I had little prior experience with SKLearn and Keras/TensorFlow. I reviewed some documentation of these before-hand but I also took an agile approach to the project, whereby I consulted documentation as and when I needed, during my various milestone sprints. I had significant experience in Python, however, from a summer internship in industry as well as experience with Git.
 
 
 \section{Convolutional Neural Networks}
@@ -186,7 +244,7 @@ The steps for training a GAN can be outlined as followed:
 
 In summary, we alternate between training of the discriminator to correctly determine real or fake data and training the generator on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
 
-\section{Machine Learning Evalutation Practises}
+\section{Machine Learning Evaluation Practices}
 Here I describe some of the main machine learning evaluation concepts that I had to have a clear idea of, prior to implementation of this project. 
 
 \subsection{Train and Test Splits}
@@ -203,7 +261,7 @@ The problem with this however is that our model may not perform well on \textbf{
 
 \centering
 \includegraphics[scale=0.8]{train-test-split}
-\caption{A 70:30 train test split of data}
+\caption{A 70:30 train test split of data.}
 \end{figure}
 
 \subsection{Cross-validation}
@@ -214,93 +272,55 @@ Cross-validation takes this a step further. The hypothesis of our model may in f
 
 \centering
 \includegraphics[scale=0.8]{cross-val}
-\caption{K-Fold Cross Validation}
+\caption{K-Fold Cross Validation.}
 \end{figure}
 
 \subsection{Resampling Methods}
 
-\subsubsection{Cross-validating Correctly}
-When employing oversampling techniques, this completely affects the way we handle cross-validation. It no longer is valid to simple oversample the dataset and then perform cross-validation. The reason for this is the potential of overfitting. Figure~\ref{fig:oversample-before} shows what can happen in this situation. Inside the cross-validation loop, the current train-test folds split means that some of the oversampled minority class (node 3) that was portioned into the test set is also in the training set. This means that our model would have seen this data during the training process and will therefore have a bias during the testing and evaluation phase as it already knows how to classify this data. 
+During the baseline work of the project I also experiment with resampling methods. These are ways of balancing the dataset such that the ratio of positive class to negative class is brought to 50:50. I do this to give an example of how these methods affect our results before moving onto the deep learning architectures. 
+The three main methods I explored were:
 
-It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Then, for every iteration of the loop, we split the data into train-test first and then oversample the training data fold only. This preserves the testing fold, keeping a portion of the original dataset untouched, for evaluation. This is a lot more effective in testing the generalisability of a model.
+\begin{enumerate}
+  \item Undersampling 
+  \item Duplicate Oversampling
+  \item Synthetic Minority Oversampling Technique (SMOTE)
+\end{enumerate}
+
+\subsubsection{Undersampling}
+Undersampling is the process of reducing the majority class down to a lower amount, to more balance with the minority class. This can be achieved by randomly removing samples until the ratio is 50:50 or other specified amount. 
+
+
+\subsubsection{Duplicate Oversampling}
+Duplicate Oversampling is a naive method of increasing the amount of the minority data class, to match that of the majority. This works by taking existing minority data points and simply duplicating them.
+
+\subsubsection{SMOTE}
+Synthetic Minority Oversampling Technique (SMOTE) is another method of increasing the amount of the minority data but not by duplication as before. SMOTE takes the $k$ nearest neighbours of a data point, randomly selects one of these k neighbours and creates a vector between the two. Then a new, synthetic data point is created some random distance along this vector line, by an amount in the range $[0,1]$.
+
+\subsubsection{Cross-validating Correctly}
+When employing oversampling techniques, this completely affects the way we handle cross-validation. It no longer is valid to simple oversample the dataset and then perform cross-validation. The reason for this is the potential of overfitting. Figure~\ref{fig:oversample-before} shows what can happen in this situation. 
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.8]{oversample-before}
-\caption{Oversampling OUTSIDE the cross-val loop}
+\caption{Oversampling OUTSIDE the cross-val loop.}
 \label{fig:oversample-before}
 \end{figure}
 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.8]{oversample-after-1}
-\caption{Oversampling INSIDE the cross-val loop [n=1]}
-\label{fig:oversample-after-1}
-\end{figure}
+Inside the cross-validation loop, the current train-test folds split means that some of the oversampled minority class (node 3) that was portioned into the test set is also in the training set. This means that our model would have seen this data during the training process and will therefore have a bias during the testing and evaluation phase as it already knows how to classify this data. 
+
+It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Figure~\ref{fig:oversample-after-1} and Figure~\ref{fig:oversample-after-2} represent the correct way to handle this, for $n=1$ and $n=2$ respectively. For every iteration of the loop, we split the data into train-test first and then oversample the training data fold only. This preserves the testing fold, keeping a portion of the original dataset untouched, for evaluation. This is a lot more effective in testing the generalisability of a model.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.8]{oversample-after-2}
-\caption{Oversampling INSIDE the cross-val loop [n=2]}
+\includegraphics[scale=0.6]{oversample-after-1}
+\caption{Oversampling INSIDE the cross-val loop [n=1].}
+\label{fig:oversample-after-1}
+
+\centering
+\includegraphics[scale=0.6]{oversample-after-2}
+\caption{Oversampling INSIDE the cross-val loop [n=2].}
 \label{fig:oversample-after-2}
 \end{figure}
-
-
-\section{Software Engineering}
-
-This section details the project requirements and early design decisions that were made.
-
-\subsection{Requirements}
-The main success criteria of the project is outlined as follows:
-
-\begin{enumerate}
-   \item Baseline Models
-   \begin{itemize}
-     \item Compare a handful of supervised learning classifiers, from SciKit-Learn.
-     \item Using metrics described in the Evaluation section of the project.
-     \item Experiment with resampling techniques. 
-     \item Implement appropriate cross-validation.
-   \end{itemize}
-   \item CNN Models
-   \begin{itemize}
-     \item Implement CNN version 1 - Single vector input approach.
-     \item Implement CNN version 2 - Time series, sliding image window approach.
-   \end{itemize}
-   \item GAN Models
-   \begin{itemize}
-     \item Implement GAN version 1 - Dense generator network.
-     \item Implement GAN version 2 - Using a CNN model from previous work as the generator network.
-     \item Experiment with how GAN is used and how it performs on the data.
-   \end{itemize}
-\end{enumerate}
-
- These were all done more or less in order. Some work overlapped, namely work on auxiliary functionality to allow appropriate cross validation or data preparation etc. More details on specifics is outlined in the implementation chapter. 
-  
-\subsection{Tools and Technologies Used} \label{tools}
-
-Below I describe and justify where necessary the tools and technologies that I used.
-
-\subsubsection{Machine Learning}
-
-I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work and SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
-
-The reasons for these choices were a mixture of good documentation, popularity \& ease-of-use. Using a TensorFlow backend meant that I could use GPU acceleration if needed. I used Keras as a TensorFlow wrapper, so I could avoid writing models completely from scratch but still giving me the flexibility to develop around models and customise to a large extent. Similarly with SciKit-Learn, which has a lot of helpful utility functions for evaluating models and processing data.
-
-\subsubsection{Version Control and Project Tools}
-
-I hosted my project in a repository on GitHub\footnote{\href{https://github.com/harrygraham/DeepLearning-CreditCardFraud}{https://github.com/harrygraham/DeepLearning-CreditCardFraud}}, used Git for version control, and used virtual environments with pip for project package management and requirements.
-
-I made heavy use of Jupyter Notebooks for writing code in an experimental manner, with immediate execution and feedback. 
-
-
-\subsubsection{Languages}
-
-My project was entirely written in Python, using the libraries and APIs described previously. This is mainly due to the large ecosystem and documentation surrounding these machine learning libraries in python and also for the ease of use of tools such as Jupyter Notebooks for experimentation.
-
-\subsection{Starting Point}
-
-My project codebase was written from scratch, with the assistance of the tools and libraries mentioned above. Apart from a basic knowledge of supervised learning covered by the part IB Artificial Intelligence course, I had to learn about most of the models and best practises myself, through thorough reading around the topics. 
-In terms of technologies, I had little prior experience with SKLearn and Keras/TensorFlow. I had significant experience in Python, however, from a summer internship in industry as well as experience with Git.
 
 
 \chapter{Implementation}
