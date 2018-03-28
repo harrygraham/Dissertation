@@ -25,7 +25,7 @@
 \contentsline {chapter}{\numberline {4}Evaluation}{17}{chapter.4}
 \contentsline {section}{\numberline {4.1}Evaluation Methodology}{17}{section.4.1}
 \contentsline {subsection}{\numberline {4.1.1}Metrics}{17}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{17}{subsection.4.1.2}
-\contentsline {section}{\numberline {4.2}Results Overview}{17}{section.4.2}
-\contentsline {chapter}{\numberline {5}Conclusions}{18}{chapter.5}
-\contentsline {chapter}{Bibliography}{19}{chapter.5}
+\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{18}{subsection.4.1.2}
+\contentsline {section}{\numberline {4.2}Results Overview}{18}{section.4.2}
+\contentsline {chapter}{\numberline {5}Conclusions}{19}{chapter.5}
+\contentsline {chapter}{Bibliography}{20}{Item.19}

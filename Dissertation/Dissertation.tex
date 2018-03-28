@@ -12,12 +12,11 @@
 \usepackage{subcaption}
 
 
-
 % For temporarily splitting the document into multiple columns
 \usepackage{multicol}
 
 % Command for extracting the word count.
-\newcommand\wordcount{\input{word.count}}
+%\newcommand\wordcount{\input{word.count}}
 
 \begin{document}
 
@@ -51,6 +50,7 @@
 
 \pagestyle{plain}
 
+% Proforma 
 \section*{\huge Proforma}
 \vspace{0.5cm}
 {\large
@@ -78,6 +78,8 @@ None.
 
 
 \newpage
+
+% Declaration
 \section*{Declaration}
 
 I, Harry Graham of Christ's College, being a candidate for Part II of the Computer Science Tripos, hereby declare that this dissertation and the work described in it are my own work, unaided except as may be specified below, and that the dissertation does not contain material that has already been used to any substantial extent for a comparable purpose.
@@ -100,6 +102,7 @@ I, Harry Graham of Christ's College, being a candidate for Part II of the Comput
 
 \pagestyle{headings} 
 
+% Introduction
 \chapter{Introduction}
 
 Credit card fraud is a globally significant and increasing problem. According to the Nilson Report \cite{nilsonreport}, annual global fraud losses reached \$22.80 billion in 2016, up 4.4\% over 2015. Machine learning has contributed a lot to this problem over the years, helping to automatically learn to classify fraudulent transactions. However, this is still somewhat tedious and clearly, the money lost due to fraud is not decreasing. Not to mention, we still have this difficult business decision of when to draw the cutoff points between classifying fraud but perhaps allowing more benign transactions to be blocked.
@@ -110,8 +113,9 @@ In particular, the aim is to shed light on the use of architectures that have ha
 This is something that has recently seen some success \cite{wang2017time} and is novel to credit card fraud data. 
 I first explore a set of baseline classifiers, which are primarily a handful of out-of-the-box supervised learning classifiers such as Random Forest. The point of these is to set the scene for experimenting with the data and to see what can be achieved with what is easily available, in other words without any 'deep' learning components. Here, I also establish techniques and methods for processing and evaluating the data i.e cross-validation, datapoint scaling, and data visualisation. 
 
-Then the project shifts to experimenting with Convolutional Neural Networks (CNNs) \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs) \cite{2014arXiv1406.2661G}.  
+Then the project shifts to experimenting with Convolutional Neural Networks (CNNs) \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs) \cite{2014arXiv1406.2661G}. The main aim of the project is to determine whether these can be applied to time-series data and in particular, the credit card fraud data. I experiment with two different variations of each, which I will outline in this dissertation. In the context of the GAN, I focus on whether this adversarial model is useful in learning the data before trying a semi-supervised, multitask learning approach in order to draw comparisons as a classification model.  
 
+% Preparation
 \chapter{Preparation} \label{preparation}
 
 \section{Software Engineering}
@@ -287,7 +291,7 @@ The three main methods I explored were:
 \end{enumerate}
 
 \subsubsection{Undersampling}
-Undersampling is the process of reducing the majority class down to a lower amount, to more balance with the minority class. This can be achieved by randomly removing samples until the ratio is 50:50 or other specified amount. 
+Undersampling is the process of reducing the majority class down to a lower amount, to balance more with the minority class. This can be achieved by randomly removing samples until the ratio is 50:50 or another specified amount. 
 
 
 \subsubsection{Duplicate Oversampling}
@@ -322,21 +326,73 @@ It is therefore crucial that this is adapted such that any oversampling occurs i
 \label{fig:oversample-after-2}
 \end{figure}
 
-
+% Implementation
 \chapter{Implementation}
 \section{Models Overview}
 \section{Baseline Models}
+\subsection{Data Preparation}
+
+\textbf{Feature Scaling}\\
+
+Standardisation involves rescaling the features such that they have the properties of a standard normal distribution with a mean of zero and a standard deviation of one. This is very important in machine learning when features can be a lot larger in magnitude than others. For example, if one feature is age and another is salary in USD then these two quantities will be on different ranges and the salary feature may negatively impact classifier algorithms by deeming that feature to be more important and confusing the weights assignment. Scaling solves this problem. 
+
+Therefore one of the first steps was to scale the features, which I did using StandardScaler from SKLearn. 
+
+\textbf{Feature Engineering}\\
+
+In many machine learning and data science applications, feature engineering is something used to add additional features based on calculations and domain knowledge of the data. In this case, though, as the data is already post-PCA and the time-series span of the transactions is only over 2 days. I decided not to do any feature engineering and to just employ algorithms on the original dataset features.
+
+\textbf{Sanity Checks}\\
+
+Also, I checked the data to see if any values were missing, or null. This was to ensure that the data was clean to be passed through machine learning networks. There were no missing data in this case.
+
+
+
 \section{Convolutional Neural Network Models}
 \section{Generative Adversarial Network Models}
 
+% Evaluation
 \chapter{Evaluation}
 \section{Evaluation Methodology}
 \subsection{Metrics}
+In this project, the metrics that were of interest were not just simply the accuracy, as with many machine learning applications. Accuracy simply measures how many correct classifications are made. This, in the context of credit card fraud, is useless. This is because, even if we classified all fraud as benign, the classifier would still be over 99\% accurate, due to the high imbalance of the fraud/non-fraud classes. In the dataset being used, fraud accounts for only 0.17\% of the total. 
+
+\textbf{Precision and Recall}\\
+
+Therefore we need to look at metrics that tell us more about what we're interested in. Two main measures of interest are \textit{Precision} and \textit{Recall}.
+
+\[
+    {Precision} = \frac{T_p}{T_p+F_p} \hspace{5mm} , \hspace{5mm} {Recall} = \frac{T_p}{T_p+F_n} \hspace{1cm}  {T_p} = {True Positive} \hspace{5mm},\hspace{5mm} {F_n} = {False Negative}
+\]
+
+Precision is intuitively the ability of the classifier to not misclassify. Recall is intuitively how well to catch fraudulent examples. 
+
+Of course the threshold by which we allow benign transactions to be misclassified as fraud, is a business decision. In the context of a bank, of course the number of fraudulent transactions caught is very important but at the same time we care about precision as this amounts to freezing customers accounts, sending text messages even though they are not subject to fraud, which ultimately costs the bank time and money and potentially customers.
+
 \subsection{Visual Inspections}
+
+\textbf{Precision-Recall Curves and ROC}\\
+When classifying, the true positive rate (TPR) and false positive rate (FPR) changes for increasing values of precision and recall. This can be visualised by looking at TPR-FPR curves. This gives an indication of how the trade-off varies for differing values.
+
+Taking the area under this curve is known as AUC, therefore gives an overall statistic for comparing classifiers. 
+
+\textbf{GAN loss function graphs and generated data visualising}\\
+With GANs, the way in which we can visualise performance is different to others due to it's specific adversarial nature. Two prominent use cases for GANs is to view the loss function graph for the generator and discriminator networks to see how the two networks fight with each other. In an ideal, theoretical world, we would expect to see the two loss curves converging to some stable value, which indicates the two networks can no longer improve or better themselves. 
+
+Also, seeing as a large part of the GAN architecture is generating data, we can inspect this to see if it looks appropriate. A common example with the MNIST dataset is to see if the generated images look like handwritten digits. In this case, we can inspect the shape and distribution of the generated fraud transactions and view them side-by-side with real fraud transactions to see if any similarities have been picked up by the network.
 
 \section{Results Overview}
 
+% Conclusion
 \chapter{Conclusions}
+
+\begin{enumerate}
+\item Can you apply DL architectures to this problem? Yes, you can apply them, good/bad? 
+\item What can you compare it to, is it useful, how does it
+compare
+\item What could the recommendation be, would you recommend to use DNN
+\end{enumerate}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % the bibliography
