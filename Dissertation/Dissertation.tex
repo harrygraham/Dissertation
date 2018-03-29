@@ -10,6 +10,8 @@
 \usepackage{float}
 \graphicspath{ {Images/} }
 \usepackage{subcaption}
+\usepackage{algorithm}% http://ctan.org/pkg/algorithms
+\usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 
 
 % For temporarily splitting the document into multiple columns
@@ -329,6 +331,14 @@ It is therefore crucial that this is adapted such that any oversampling occurs i
 % Implementation
 \chapter{Implementation}
 \section{Models Overview}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{models_overview}
+\caption{Overview of models experimented with.}
+\label{fig:models_overview}
+\end{figure}
+
 \section{Baseline Models}
 \subsection{Data Preparation}
 
@@ -346,10 +356,99 @@ In many machine learning and data science applications, feature engineering is s
 
 Also, I checked the data to see if any values were missing, or null. This was to ensure that the data was clean to be passed through machine learning networks. There were no missing data in this case.
 
+\subsection{Cross Validation Function}
 
+Defining my own cross-validation function early on was a crucial step in this project. As explained briefly in the preparation chapter, the way in which cross-validation is performed is very important to ensure no overfitting occurs and that the results are as confident as they can be. As far as implementation is concerned, It was not enough to use the built in SKLearn cross-val function as it did not provide enough granularity in it's output. I wanted very specific metrics and not to mention, I needed to resample data in the correct place which meant I needed to define my own function, based on the standard library which uses Stratified KFold. This essentially means that the splitting of the data in each fold of the KFold procedure, contains at least some portion of the underrepresented class. This is important as it would be very common that some folds don't contain any of the minority class. 
+
+The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1}, which simply reports the precision, recall and f1-score for predicted values. You give it a set of predicted values and the set of true values and it calculates the metrics. I use this inside my function to report the metrics we are interested in, something I could not do originally. 
+
+\begin{algorithm}[H]
+\caption{Cross-Validation function }\label{cross-val}
+\begin{algorithmic}[1]
+\Procedure{custom-cross-val}{$X, Y, CLF, N$}
+
+   \State $skfolds\gets \textbf{StratifiedKFold}(n\_splits = N)$\\
+   
+   \State $precisions\gets []$
+   \State $recalls\gets []$
+   \State $f1scores\gets []$
+   \State $elapsedtimes\gets []$\\
+   
+   \For{\texttt{train\_indices, test\_indices in skfolds.split(X,Y)}}
+        \State
+         \texttt{\State $X\_train\_folds\gets X[train\_indices]$}
+        \texttt{ \State $Y\_train\_folds\gets Y[train\_indices]$}
+        \texttt{ \State $X\_test\_folds\gets X[test\_indices]$}
+         \texttt{\State $Y\_test\_folds\gets Y[test\_indices]$}
+         
+         \texttt{\State $X\_res, Y\_res \gets \textbf{Resample}(X\_train\_folds,Y\_train\_folds)$}
+         
+          \texttt{\State $ start \gets current time$} 
+          \texttt{ \State \textbf{CLF.fit}($X\_res, Y\_res$)} 
+          \texttt{\State $ end \gets current time$} 
+          \texttt{\State $ elapsed \gets end - start$} 
+          \texttt{\State elapsedtimes.append(elapsed)} 
+           \texttt{\State $y\_pred \gets \textbf{CLF.predict}(X\_test\_folds)$} 
+          \texttt{\State $stats \gets \textbf{precision\_recall\_f1}(y\_pred, Y\_test\_folds )$} 
+          
+          \texttt{\State precisions.append(stats[0])}
+          \texttt{\State recalls.append(stats[1])}  
+          \texttt{\State f1scores.append(stats[2])} 
+   \EndFor
+   
+   \State \textbf{return} [ mean(precisions), mean(recalls), mean(f1scores), mean(elapsedtimes) ]
+   
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+This is something I could then use for varying \textbf{Resample} methods. 
+
+\subsection{Cross Validation the Wrong Way}
+\textbf{Test\_Train\_Split vs Custom cross\_val\_score using KFold}\\
+This concerns the underlying approach for the cross validation loop. We have have already seen we can use sklearn's test\_train\_split function to split the data into train and test portions. We can then oversample our training data, fit the model and make predictions using the test set.
+Approach 1 would be to simply do this multiple times and average the results.
+This approach, however, will give better results than expected (which will be shown in a later section, I go on to implement this version for comparison). The reason for this is due to the nature of test\_train\_split and it's randomness.
+Problems with this method:
+Test\_train\_split allows you to randomly split your data, by giving a parameter that specifies the ratio. However as the split is random, it is likely that there will be overlap in the CV iterations as to which data points are put in the test set. In other words, values selected during one iteration, could be selected again during another iteration.
+The consequences of this means that the model may not be exposed to particular portions of the data whereby it does not generalise well and we are not capturing that in our results. Also, It is not making maximal use of the data we have.
+
+\subsection{Resampling functions}
+\subsection{Collecting Results for All Classifiers}
 
 \section{Convolutional Neural Network Models}
+\subsection{CNN Version 1}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{cnnv1}
+\caption{Overview of CNN Model 1.}
+\label{fig:cnnv1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{cnnv2-1}
+\caption{Overview of CNN Model 2 - Part 1.}
+\label{fig:cnnv2-1}
+\end{figure}
+
+\subsection{CNN version 2}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{cnnv2-2}
+\caption{Overview of CNN Model 2 - Part 2.}
+\label{fig:cnnv2-2}
+\end{figure}
+
 \section{Generative Adversarial Network Models}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{gan-ssl}
+\caption{Overview of GAN-SSL discriminator output.}
+\label{fig:gan-ssl}
+\end{figure}
+
 
 % Evaluation
 \chapter{Evaluation}
