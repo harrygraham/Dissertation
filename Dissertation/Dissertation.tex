@@ -13,6 +13,36 @@
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+ 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    deletekeywords={compile}
+}
+ 
+\lstset{style=mystyle}
+
 
 % For temporarily splitting the document into multiple columns
 \usepackage{multicol}
@@ -69,7 +99,7 @@ Supervisors:         & B.~Dimanov \& Dr M.~Jamnik
 }
 
 \section*{Original Aims of the Project}
-The primary aim of the project was to implement and compare some deep learning techniques, alongside some baseline models, for credit card fraud detection (CCFD). More specifically, I aimed to experiment with two popular types of architecture, namely Convolutional Neural Networks (CNNs)  \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs). These have been successful in the image classification space and the aim of this project was to shed light on their use in the credit card fraud space. This kind of experimentation of predominantly image-based models, on single dimensional, time-series data is a relatively novel approach for CCFD.
+The primary aim of the project was to see whether we can use certain deep learning techniques on time series data, in particular for credit card fraud detection (CCFD). More specifically, I aimed to experiment with two popular types of architecture, namely Convolutional Neural Networks (CNNs)  \cite{DBLP:journals/corr/SimonyanZ14a} and Generative Adversarial Networks (GANs). These have been successful in the image classification space and the aim of this project was to shed light on their use in the credit card fraud space. This kind of experimentation of predominantly image-based models, on single dimensional, time-series data is a relatively novel approach for CCFD.
 
 \section*{Work Completed}
 All of the core project aims set out in the proposal have been met, meaning results have been collated and evaluated across the three main components of the project: Baseline Models, CNN methods and GAN methods. 
@@ -405,19 +435,80 @@ The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1
 This is something I could then use for varying \textbf{Resample} methods. 
 
 \subsection{Cross Validation the Wrong Way}
+
 \textbf{Test\_Train\_Split vs Custom cross\_val\_score using KFold}\\
-This concerns the underlying approach for the cross validation loop. We have have already seen we can use sklearn's test\_train\_split function to split the data into train and test portions. We can then oversample our training data, fit the model and make predictions using the test set.
-Approach 1 would be to simply do this multiple times and average the results.
-This approach, however, will give better results than expected (which will be shown in a later section, I go on to implement this version for comparison). The reason for this is due to the nature of test\_train\_split and it's randomness.
-Problems with this method:
+This concerns the underlying approach for the cross validation loop. SKLearn's test\_train\_split function splits the data into train and test portions. We can then oversample our training data, fit the model and make predictions using the test set.
+One approach that perhaps would be a logical one, would be to simply do this multiple times and average the results.
+This approach, however, will give better results than expected (which I showed in my experiments, results outlined in the evaluation chapter). The reason for this is due to the nature of test\_train\_split and it's randomness.
+
 Test\_train\_split allows you to randomly split your data, by giving a parameter that specifies the ratio. However as the split is random, it is likely that there will be overlap in the CV iterations as to which data points are put in the test set. In other words, values selected during one iteration, could be selected again during another iteration.
 The consequences of this means that the model may not be exposed to particular portions of the data whereby it does not generalise well and we are not capturing that in our results. Also, It is not making maximal use of the data we have.
 
+I ran my classifiers using this approach, too, as a means of comparison of what can go wrong and give invalid results, if you're not careful. The correct way, the way which was detailed above, is using KFold cross validation to split the data during a loop and doing any customisations or resampling inside this loop.
+
 \subsection{Resampling functions}
+To implement resampling functions I made use of the \textbf{imbalanced-learn}\cite{JMLR:v18:16-365} library. This is an API that focused on methods for unbalanced datasets, including oversampling and SMOTE techniques. They have written functions that do exactly what I needed so I made use of their work in this small part of my project. 
+
+I created simple functions in the form of:\\
+\textbf{Input: X data, Y data}\\
+\textbf{Output: X-res, Y-res}\\
+Where X-res and Y-res are the resampled X and Y data. 
+
+\textbf{Duplicate Oversampling}\\
+For random, duplicate Oversampling I used their \textbf{imblearn.over\_sampling.RandomOverSampler.} This does as I described in the preparation chapter. Randomly selects a datapoint and duplicates it, or in other words 'selecting random data points, with replacement'.
+
+\textbf{SMOTE}\\
+For SMOTE, I used their \textbf{imblearn.over\_sampling.SMOTE}. The default parameter of k\_neighbors was used, which is a value of 5, which was fine for this use. 
+
 \subsection{Collecting Results for All Classifiers}
+By using the carefully constructed cross-validation algorithms defined above for the various resampling methods, I constructed a general algorithm to loop through the classifiers i'm interested in and running cross-validation for each of them, for each resampling method and collating results in a Python DataFrame log. 
+
+The algorithm outline can be viewed as follows:
+
+\begin{algorithm}[H]
+\caption{All Classifiers Run }\label{all-classifiers}
+\begin{algorithmic}[1]
+\Procedure{all-classifiers-run}{}
+        \State
+         \texttt{\State $classifiers \gets [KNeighborsClassifier, LinearSVC, DecisionTreeClassifier,$\\ $RandomForestClassifier, MLPClassifier, GaussianNB]$}
+          \texttt{\State $columns \gets ["precision", "recall", "f1", "auc", "training-time"]$}
+         \texttt{\State $log\_original \gets DataFrame(columns = columns)$}
+         \texttt{\State $log\_under \gets DataFrame(columns = columns)$}
+         \texttt{\State $log\_over \gets DataFrame(columns = columns)$}
+         \texttt{\State $log\_smote \gets DataFrame(columns = columns)$}
+         
+   	\For{\texttt{clf in classifiers}}
+
+            	\State {$log\_entry\_original\gets  \textbf{cross\_val\_original}(data, clf, 3) $}
+            	\State $log\_entry\_under\gets  \textbf{ cross\_val\_under}(data, clf, 3) $
+            	\State $log\_entry\_over \gets \textbf{cross\_val\_over}(data, clf, 3) $
+            	\State $log\_entry\_smote \gets \textbf{cross\_val\_smote}(data, clf, 3) $
+            	\State $log\_original \gets \textbf{log\_original.append}(log\_entry\_original $
+            %	\State
+   	\EndFor
+   
+   \State \textbf{return} [ mean(precisions), mean(recalls), mean(f1scores), mean(elapsedtimes) ]
+   
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+I used Python DataFrames as they were a convenient method of storing the results and meant I could construct tables of results in a very organised way. Also, DataFrames have nice methods for plotting data and saving the results to disk. 
+
 
 \section{Convolutional Neural Network Models}
+
+\subsection{Overview}
+In this section, I describe the work I completed in constructing the CNN models and retrieving results using these models. I experimented with two main approaches that were briefly designed and outlined in the initial stages of the project. The main goal here is to see if it is suitable and indeed effective to use these types of deep learning models on time series data, specifically with the credit card fraud data. Prior to implementing these models, I had to do thorough reading of how CNNs work (detailed briefly in the preparation chapter).
+
+
 \subsection{CNN Version 1}
+
+\subsubsection{Version 1-1}
+In the first proposed approach for my CNN models, the network bridges from our baseline models by keeping single vector data as inputs. In other words, the input to the first CNN is still a 30 x 1 transaction vector. I then introduce convolutional aspects to the network and aim to construct a model appropriately based on the output of each layer. 
+
+Figure~\ref{fig:cnnv1} shows the outline of basic CNNv1 network.
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.6]{cnnv1}
@@ -425,14 +516,60 @@ The consequences of this means that the model may not be exposed to particular p
 \label{fig:cnnv1}
 \end{figure}
 
+The input layer takes a transactional vector. Then, a convolutional layer performs convolutions on the input data, using 30x1 kernels, of which there are 256, differently initialised. This creates 256 1x1 outputs. By flattening these outputs, I then introduce a fully connected layer, which essentially means that every node is connected to every other node, between the flattened layer and the subsequent dense layer of which I used 300 nodes. Then there is a softmax output layer which takes the weighted sum of the fully connected layer and also has an activation, as with usual neural network architectures and gives us our predictions, corresponding to Fraud or Genuine.
+
+\subsubsection{Version 1-2}
+In an attempt to take this model a little further, I tried a variation whereby I added an extra convolutional layer and also an extra dense layer in the fully connected section. This was to give an indication of effect of additional layers would have.
+
+The results of this version was also reported and compared with Version 1-1. 
+
+Listing~\ref{lst:cnnv1-1-createmodel} is a code snippet that shows the short function that creates CNNv1-1. 
+
+\lstinputlisting[language=Python, caption=CNNv1-1 create\_model function., label={lst:cnnv1-1-createmodel}]{code-snippets/cnnv1-snippet-1.py}
+
+Listing~\ref{lst:cnnv1-2-createmodel} is a code snippet that shows the short function that creates CNNv1-2. 
+
+\lstinputlisting[language=Python, caption=CNNv1-2 create\_model function., label={lst:cnnv1-2-createmodel}]{code-snippets/cnnv1-snippet-2.py}
+
+
+
+\subsubsection{ReLU Activations}
+
+On each hidden layer, I use the Rectified Linear Unit (ReLU). In modern deep learning applications, the use of the ReLU activation is very popular and there are valid reasons for this, one perhaps most prominent is mitigating the vanishing gradient problem. 
+
+The ReLU function is defined mathematically as:
+$$f ( x ) = x ^ { + } = \max ( 0,x )$$
+
+The Sigmoid Activation is defined as:
+$$S ( t ) = \frac { 1} { 1+ e ^ { - t } }$$
+
+The gradient of sigmoid is:
+
+$$S ^ { \prime } ( t ) = S ( t ) ( 1.0- S ( t ) )$$
+
+\textbf{Vanishing Gradient Problem}
+During gradient based learning methods, a weight update is back propagated through a network. We see that the gradient of a sigmoid activation will be close to zero if the output is close to the tail ends of 0 or 1 (saturated neurons). This is a problem when there are multiple layers to the network as we multiply near-zero quantities every time and hence we have a 'vanishing gradient'. This means that even large changes, will attenuate through the network and result in affecting the output less. The hyperbolic tangent function activation also has this saturation problem. 
+
+The ReLU activation however, has a constant gradient. This means there is no attenuation in the back propagated signal and actually training is faster. The mathematical calculations are easier too, as the ReLU does not use exponentials. In the ImageNet\cite{krizhevsky2012imagenet} paper by Krizhevsky et al, they show the effect of using ReLU with respect to speed of training. 
+
+\subsection{CNN Version 2}
+
+\subsubsection{Overview}
+
+Version 2 aims to explore more the idea of arranging the transactions temporally and trying to use the image metaphor, to unravel relationships in the data. In this setup, a bit more preprocessing is needed in order to suit the network. The model itself takes an input batch of 100 vectors, so we have a 100 x 30 block. Then here our kernel (or filter) is 5 x 30 block which slides down the temporally ordered block and convolves with the features, to give the output. 
+
+Doing some maths here, a window of height 5, can be positioned in 96 unique positions over the batch. Again, the model uses a number of different filters which are initialised. Figure~\ref{fig:cnnv2-1} shows this process, using 32 different kernels. This gives an output of 96 (from the convolution) x 32 (the number of different kernels).
+
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.6]{cnnv2-1}
+\includegraphics[scale=0.5]{cnnv2-1}
 \caption{Overview of CNN Model 2 - Part 1.}
 \label{fig:cnnv2-1}
 \end{figure}
 
-\subsection{CNN version 2}
+
+Figure~\ref{fig:cnnv2-2} then shows the remainder of the model. The output from the convolutions are flattened and hooked up to a fully connected layer. Then the softmax output layer, as before, to output our classification probabilities. 
+
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.6]{cnnv2-2}
@@ -440,7 +577,113 @@ The consequences of this means that the model may not be exposed to particular p
 \label{fig:cnnv2-2}
 \end{figure}
 
+\subsubsection{Preprocessing}
+
+Due to the nature of this network, a lot more care has to go into preprocessing the data so that we can pass it through the model. One important thing is to batch together the dataset into chunks of size 100 (in this case), as this is the input of the model. So if the original size of the training data is (199365, 30), then we want to transform this to (1994, 100, 30). However, if the length of the training set is not a whole multiple of 100 then there will be a problem with the final batch. In order to fix this, the final batch is padded with zeros. 
+
+Listing~\ref{lst:cnnv2-batchreshape} outlines a function that packs up this transformation into a function that can be reused for varying values of this hyper-parameter.
+\lstinputlisting[language=Python, caption=CNNv2 batch reshape function., label={lst:cnnv2-batchreshape}]{code-snippets/cnnv2-batch-reshape.py}
+
+
 \section{Generative Adversarial Network Models}
+
+\subsection{Overview}
+As described in the preparation chapter, GANs are essentially two networks that play a game with each other, each trying to reduce their own loss function. 
+
+The three major components of a GAN are the generator network, the discriminator network and the combined network training process. Below, I outline the steps needed in the adversarial training stage of the GAN, as well as various utilities that were import to the setup and running of the models. 
+
+Then this section outlines the three major variations in which I experimented; two variations on the generator network and then an attempt at incorporating a semi-supervised learning approach to treat the GAN as a classifier. This came about due to the fact that GANs in their common use case, display how the networks perform with regard to their loss functions and also can display the intermediate generations (like in the classic MNIST dataset) to visually inspect how the GAN is performing. Seeing as the data I am working with, is inherently used in classification problems, it is of interest to experiment with using the GAN as so. However, simply investigating how the generator performs at constructing fraud-like data is also very interesting, this could have potential of helping the domain create more data on which to train with. 
+
+Below, listing~\ref{lst:gan-classdefinition} shows the abstract definition of the GAN class, in which I wrapped up all of the main functions of the model. This definition shows the prominent functions with short descriptions. 
+\lstinputlisting[language=Python, caption= GAN Class Definition., label={lst:gan-classdefinition}]{code-snippets/GAN-classdefinition.py}
+
+\subsection{Adversarial Training}
+
+The training procedure of the GAN is a crucial component. Unlike other models in Keras, a GAN is not nicely wrapped up in one library function and so we have to connect up networks ourselves and implement the training process from scratch. This is what I did in the GAN class. The training process must do a number of things, which I outline below in a high-level pseudo-code algorithm:
+
+\begin{algorithm}[H]
+\caption{Adversarial Training }\label{gan-train}
+\begin{algorithmic}[1]
+\Procedure{Gan-Train}{$self, epochs, batch\_size=128, save\_interval=200$}
+	
+        \State \textbf{Get X and Y train data}
+        \State \textbf{Reshape training data into tensors} 
+        \State 
+         
+   	\For{\texttt{epoch in epochs}}
+		\State
+		\Comment Discriminator Training 
+		\State \textbf{Take a random half batch of training data}
+		\State \textbf{Generate, using the generator, a half batch of fake data}\\
+		\State \textbf{Set discriminator.trainable = True}\\
+		\State \textbf{Create half batch number of labels for the real and fake data}
+		\State \textbf{Format labels into categorical shape}
+		\State \textbf{Train discriminator separately on real and fake data}
+		\State \textbf{Set discriminator.trainable = False}\\
+		\State
+		\Comment Generator Training 
+		\State \textbf{Create random noise} 
+		\State \textbf{Create associated positive labels for the random noise}
+		\State \textbf{Train the Combined model using this noise and labels}\\
+		\State \textbf{Save and Append losses of both networks }
+		\State
+		\Comment Save Intervals
+		\If{epoch \textbf{mod}  save\_interval == 0}
+			\State \textbf{Save current generated output}
+		\EndIf
+   	\EndFor
+   
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+The Adversarial Training algorithm shown is a very high level outline of the procedure. Some lines in particular contain a lot under the hood:
+
+\textbf{Line 3: Reshape training data into tensors}. This line takes the training data and expands the dimensions in order to satisfy the 3D tensor requirement of the models. This is due to TensorFlow being the underlying engine. 
+
+\textbf{Line 13: Format labels into categorical shape}. Because I used categorical cross-entropy loss in the combined GAN model, the labels of the data needs to be in a binary matrix representation. Targets are in categorical format (e.g. if you have 2 classes, the target for each sample should be a 2-dimensional vector that is all-zeros except for a 1 at the index corresponding to the class of the sample).
+
+\textbf{Line 20: Train the Combined model using this noise and labels}. As outlined in the subsections below, in order to train the generator, we need the discriminator too and thus this is a combined model. The model must be carefully defined so that the loss of the combined model incorporates the loss of the generator. Essentially the networks are stacked together. This is also why in \textbf{Line 15}, we set the discriminator to untrainable (i.e frozen) so that the current state of the network can be used when training the generator in order to allow it to improve. 
+
+\textbf{Line 22: Save and Append losses of both networks}. This line covers the work of saving the loss of each network with every epoch, in order to do things like plotting the loss curves for visual evaluation.
+
+\textbf{Line 25: Save current generated output}. When the save interval is reached, a utility function is called that I implemented to do a number of things. One of which was to use the current state of the generator to take some random noise and generate an output. This is so that we can visualise what the current output looks like at this epoch. This function also includes the various plotting utilities that builds up the final figure which shows generated output for regular training intervals. 
+
+Notice also, how we train the discriminator on real and fake data separately, to give a stable and clear separation of the data.
+
+\subsection{Utility Functions}
+
+\subsection{GAN Version 1 - Dense Generator}
+
+In the first GAN version I focus on creating the generator network from scratch, instead of importing one of the previous CNN models. The dense generator network takes in random noise as input, has a series of hidden dense layers and includes regularisation layers such as Leaky ReLU activations and Batch Normalisation.
+
+An outline of the dense generator network can be viewed as:
+\lstinputlisting[language=Python, caption= GAN v1 - Dense Generator., label={lst:ganv1-generator}]{code-snippets/ganv1-generator.py}
+
+
+\subsubsection{Leaky ReLUs}
+I use leaky ReLU to allow gradients to flow backwards through the layer unimpeded. TensorFlow does not provide an operation for leaky ReLUs, However the Keras API has a nice wrapper for adding this as a layer. The alpha parameter is essentially how 'leaky' we want the negative gradient to be and in a lot of cases we just want this to be slight, to avoid it being completely zero and so a value of 0.2 is emplyed here. This is something that is quite common amongst GAN papers, in particular in DCGAN(deep convolutional GAN)\cite{DBLP:journals/corr/RadfordMC15}. One of the main problems Leaky ReLUs solve is the dying ReLU problem, whereby a large gradient flowing through a ReLU node could cause the weights to update in such a way that the neuron will never activate again. It is common on large scale networks that a large proportion is 'dead'. I care about this here in the GAN, as the network is very dense in terms of the amount of epochs we train on the data and so I want to mitigate this problem. 
+
+\textbf{Batch Normalisation} layers aim to increase stability of the networks (which in GANs is something we really care about) by normalising node outputs, just like we do to data in the original preprocessing stages.
+
+\subsubsection{The Adam Optimiser}
+The Adam optimiser is one which is often seen as the default to use in modern deep learning applications, due to empirical evidence reported in the original paper\cite{DBLP:journals/corr/KingmaB14} whereby it is stated ``Using large models and datasets, we demonstrate Adam can efficiently solve practical deep learning problems" and showing it's performance over that of other optimiser functions. 
+
+To this end, I used the Adam optimiser as the primary algorithm in my models. Adam is not like classical stochastic gradient descent, whereby a single, constant learning rate is maintained across all weights but instead the method computes individual adaptive learning rates for different parameters.
+
+By altering the learning rate in the Adam optimiser, I was able to see better convergence in my GAN loss graphs. 
+
+\subsection{GAN Version 2 - Previous CNN Generator}
+
+The second GAN model was set up with the aim that the generator network would be convolutional and also, be the same as one of our previous CNN experiments. I used the model from CNNv1. This meant that I had to add some functionality to save the model to disk and load the model into the GAN program, conserving the weights. An extra layer of complexity is that I needed to be able to adapt the layers, the output layer needs to be changed to one in which the output is of the shape we want. To do this, I popped the last layer of the model and constructed a dense and reshape layer to model the generated shape we need (which in this case is a 1 by 30 vector, but in 3D tensor form). Then, using the Keras functional API to wrap layers around each other, I constructed the generator by hooking up the input of the loaded CNN model, with the adapted layers. 
+
+
+
+\subsection{Semi-Supervised Learning for Classification}
+
+
+
+
 
 \begin{figure}[H]
 \centering
