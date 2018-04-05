@@ -12,6 +12,7 @@
 \usepackage{subcaption}
 \usepackage{algorithm}% http://ctan.org/pkg/algorithms
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
+\usepackage{booktabs}% http://ctan.org/pkg/booktabs
 
 \usepackage{listings}
 \usepackage{color}
@@ -47,8 +48,8 @@
 % For temporarily splitting the document into multiple columns
 \usepackage{multicol}
 
-% Command for extracting the word count.
-%\newcommand\wordcount{\input{word.count}}
+% For inserting PDF.
+\usepackage{pdfpages}
 
 \begin{document}
 
@@ -584,6 +585,19 @@ Due to the nature of this network, a lot more care has to go into preprocessing 
 Listing~\ref{lst:cnnv2-batchreshape} outlines a function that packs up this transformation into a function that can be reused for varying values of this hyper-parameter.
 \lstinputlisting[language=Python, caption=CNNv2 batch reshape function., label={lst:cnnv2-batchreshape}]{code-snippets/cnnv2-batch-reshape.py}
 
+\subsubsection{Time-Series Cross-Validation}
+
+Due to the fact that this CNN model specifically exploits the temporal ordering of the transactions, the usual method of cross-validating becomes insufficient. This is because during the usual, KFold procedure, the data will be split randomly and of course this will violate temporal ordering. In general, cross-validating for predictive modelling like this is tricky, but there are a ways of doing it. I outline one here in my implementation. 
+
+The approach is to split the data as usual (perhaps a 70:30 split), but keeping the temporal ordering such that every transaction after the cutoff point (i.e in the testing set) has a transaction with time $T > T_{n} $, where $T_{n}$ is the last transaction of the training set. When transactions are ordered by time, in the real world we often predict only the next one or two time steps (think of stock market fluctuations). We can use this therefore to average results across the size of the testing set, progressively predicting less test data. 
+
+This can be visualised as follows:
+
+$$ [1] [2] [3] [4]  --- [5] [6] [7] , \hspace{5mm}  n=1$$
+$$ [1] [2] [3] [4] [5] --- [6] [7] ,\hspace{5mm}  n=2$$
+$$ [1] [2] [3] [4] [5] [6] --- [7] ,\hspace{5mm}  n=3$$
+
+The implementation of this is through wrapping the model creation into it's own function, like previously, taking parameters to make the batch-size and window-height dynamic. Inside the cross-validation function itself, the preprocessing, model creation and model predictions are all wrapped up together. There is also another auxiliary function that generates the time-series split of the data by ordering it and splitting it at a specified ratio, given to the function as a parameter. Inside the cross-validation this function is called with decreasing value, to return a progressively larger training set and smaller test set with every iteration. 
 
 \section{Generative Adversarial Network Models}
 
@@ -651,8 +665,6 @@ The Adversarial Training algorithm shown is a very high level outline of the pro
 
 Notice also, how we train the discriminator on real and fake data separately, to give a stable and clear separation of the data.
 
-\subsection{Utility Functions}
-
 \subsection{GAN Version 1 - Dense Generator}
 
 In the first GAN version I focus on creating the generator network from scratch, instead of importing one of the previous CNN models. The dense generator network takes in random noise as input, has a series of hidden dense layers and includes regularisation layers such as Leaky ReLU activations and Batch Normalisation.
@@ -673,6 +685,19 @@ To this end, I used the Adam optimiser as the primary algorithm in my models. Ad
 
 By altering the learning rate in the Adam optimiser, I was able to see better convergence in my GAN loss graphs. 
 
+\subsubsection{Training Variations}
+
+Given that this is very experimental, I also tried variations of the models in order to see what effect they had on the loss curves and generated outputs. The idea being that these may combat the main problem of one network overpowering the other. I outline some of the variations I tried below.
+
+\begin{itemize}
+\item Standard adversarial training: with each epoch, the discriminator and generator are training independantly. 
+\item Pre-training the discriminator for 500 epochs and then letting the generator learn for the remainder.
+\item Alternating between training the discriminator for 500 epochs and then the generator for 500 epochs.
+\item Using SMOTE on the data
+\end{itemize}
+
+In addition to these, I adjusted the learning rate of the Adam optimiser. 
+
 \subsection{GAN Version 2 - Previous CNN Generator}
 
 The second GAN model was set up with the aim that the generator network would be convolutional and also, be the same as one of our previous CNN experiments. I used the model from CNNv1. This meant that I had to add some functionality to save the model to disk and load the model into the GAN program, conserving the weights. An extra layer of complexity is that I needed to be able to adapt the layers, the output layer needs to be changed to one in which the output is of the shape we want. To do this, I popped the last layer of the model and constructed a dense and reshape layer to model the generated shape we need (which in this case is a 1 by 30 vector, but in 3D tensor form). Then, using the Keras functional API to wrap layers around each other, I constructed the generator by hooking up the input of the loaded CNN model, with the adapted layers. 
@@ -681,9 +706,17 @@ The second GAN model was set up with the aim that the generator network would be
 
 \subsection{Semi-Supervised Learning for Classification}
 
+Semi-Supervised learning\cite{odena2016semi} is an approach in which the output of the discriminator network is altered such that the network splits the real probability into N classes and thus giving us means of classifying with the model. 
 
+A difficulty that lies with trying to use the GAN as a classifier, is in the decision of what to base the generative model on. In the previous models, I was experimenting mainly on how well we can learn and generate fraudulent data and with some parameter tweaking, a stable GAN could be achieved with interesting results. However If we want to classify between Fraud and Genuine as well as Fake and Generated then the network needed to be training on the genuine examples too. 
 
+Some problems that can occur here are fairly logical. If we only train to generate fraud then the network might learn that all fraud-like data is simply fake. On the other hand if we train the generator to generate a transaction in general (i.e both fraud and genuine) then the imbalance in the dataset may have a hard time to pick up fraud. 
+I experimented with a few variations to see how classification results compare. 
+These variations were: generating fraud only, providing the discriminator with half fraud and half genuine examples from the real data and just trying to generate transactions in general from providing the discriminator with original dataset examples.
 
+One important key factor with GANs is the number of epochs. Letting the training process go on for a longer time could potentially have a great effect on results obtained. This was very much part of the experimentation process. In the case of the GAN variations, this proved to decrease the number of misclassified benign transactions, significantly.
+
+Figure~\ref{fig:gan-ssl} below shows a diagram that outlines the change that the semi-supervised approach has on the output of the discriminator network. Effectively this is a form of multi-task learning; one output is a sigmoid layer that gives us the probability of an example being fake or generated and the other is a softmax output which gives us probabilities of class labels, as discussed. The dynamic of the GAN changes here, the discriminator becoming the predominant network that learns to classify. 
 
 \begin{figure}[H]
 \centering
@@ -692,6 +725,10 @@ The second GAN model was set up with the aim that the generator network would be
 \label{fig:gan-ssl}
 \end{figure}
 
+\subsubsection{Problems with GANs}
+
+\textbf{Mode Collapse}: One problem when training the GAN for a large number of epochs, is a problem called Mode Collapse. This can be visualised in the generated output when the data distributed 'collapses' and suddenly becomes a lot more refined. This is the network learning a certain range and shape of data particularly well and disregarding the rest. In attempt to mitigate this problem you can try adjusting the number of epochs for which you let the network run, to try and best capture the data distribution. 
+
 
 % Evaluation
 \chapter{Evaluation}
@@ -699,7 +736,7 @@ The second GAN model was set up with the aim that the generator network would be
 \subsection{Metrics}
 In this project, the metrics that were of interest were not just simply the accuracy, as with many machine learning applications. Accuracy simply measures how many correct classifications are made. This, in the context of credit card fraud, is useless. This is because, even if we classified all fraud as benign, the classifier would still be over 99\% accurate, due to the high imbalance of the fraud/non-fraud classes. In the dataset being used, fraud accounts for only 0.17\% of the total. 
 
-\textbf{Precision and Recall}\\
+\subsubsection{Precision and Recall}
 
 Therefore we need to look at metrics that tell us more about what we're interested in. Two main measures of interest are \textit{Precision} and \textit{Recall}.
 
@@ -710,6 +747,38 @@ Therefore we need to look at metrics that tell us more about what we're interest
 Precision is intuitively the ability of the classifier to not misclassify. Recall is intuitively how well to catch fraudulent examples. 
 
 Of course the threshold by which we allow benign transactions to be misclassified as fraud, is a business decision. In the context of a bank, of course the number of fraudulent transactions caught is very important but at the same time we care about precision as this amounts to freezing customers accounts, sending text messages even though they are not subject to fraud, which ultimately costs the bank time and money and potentially customers.
+
+\subsubsection{F1-Score}
+
+F1-score is the harmonic mean of both precision and recall. In general, F-measure can be defined as:
+$$F = \frac { 1} { \alpha \frac { 1} { P } + ( 1- \alpha ) \frac { 1} { R } } = \frac { \left( \beta ^ { 2} + 1\right) P R } { \beta ^ { 2} P + R } \quad \text{ where } \quad \beta ^ { 2} = \frac { 1- \alpha } { \alpha }$$
+This is a weighted harmonic mean and allows us to use the parameters to pay more attention to precision or recall. The most common case, however, is the balanced $F_1$ score which uses $\beta = 1$ or $\alpha=0.5.$
+Thus giving:
+$$F _ { 1} = \frac { 2P R } { P + R }$$
+
+The reason why we us this harmonic approach, rather than a standard average is so that extreme cases are penalised more. Of course, reported values of F1-Scores are actually just snapshots of single precision and single recall scores, AUC captures a summary of these as described below. 
+
+\subsubsection{Confusion Matrix}
+
+A confusion matrix summarises the number of examples that were classified into either:\\
+\begin{enumerate}
+\item \textbf{TP - True Positive - We predict fraud and it is fraud.}
+\item \textbf{TN - True Negative - We predict benign and it is benign.}
+\item \textbf{FP - False Positive - We predict fraud but it is actually benign.}
+\item \textbf{FN - False Negative - We predict benign but it is actually fraud.}
+
+\end{enumerate}
+
+These statistics are shown in a matrix representation, that can be printed out using plotting utilities, to easily inspect how a classifier has performed. Figure~\ref{fig:cm-example} below shows an example confusion matrix plot, for a single run of a logistic regression classifier. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{cm-example}
+\caption{Example Confusion Matrix plot.}
+\label{fig:cm-example}
+\end{figure}
+
+From these, precision, recall and F measure scores can therefore be calculated and a classification report summary can be shown. 
 
 \subsection{Visual Inspections}
 
@@ -724,16 +793,361 @@ With GANs, the way in which we can visualise performance is different to others 
 Also, seeing as a large part of the GAN architecture is generating data, we can inspect this to see if it looks appropriate. A common example with the MNIST dataset is to see if the generated images look like handwritten digits. In this case, we can inspect the shape and distribution of the generated fraud transactions and view them side-by-side with real fraud transactions to see if any similarities have been picked up by the network.
 
 \section{Results Overview}
+\subsection{Baseline Models}
+\subsubsection{Results Table}
+
+Here, I simply report the table of results (see table~\ref{table:baseline-results} below) for the baseline classifiers, for every type of resampling method. These results came from the cross-validation described in the previous two chapters.
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+     Classifier & F1 & Precision & Recall & AUC-ROC \\ \midrule
+     \textbf{Original Dataset} \\ \midrule
+    LogisticRegression & 0.679526 &  0.858680 & 0.585366 & 0.792588 \\
+    KNeighborsClassifier & 0.777306 &  0.834855 & 0.739837 & 0.869780\\
+    LinearSVC  & 0.752517 &  0.887192  & 0.680894 & 0.840350 \\
+    DecisionTreeClassifier & 0.648748 & 0.584061 & 0.747967 & 0.873483 \\
+    RandomForestClassifier & 0.789572 &  0.867006  & 0.737805 & 0.868790\\
+    MLPClassifier & 0.759672  & 0.801885 & 0.737805 & 0.868720 \\
+    GaussianNB & 0.114077  & 0.061255 & 0.833333 & 0.905594 \\ \midrule
+    \textbf{Under-Sampled Dataset} \\  \midrule
+    
+    LogisticRegression & 0.062811 &  0.032562 & 0.884146 & 0.919338 \\
+    KNeighborsClassifier & 0.128275  & 0.069294 & 0.884146 & 0.931555\\
+    LinearSVC  & 0.068514 &  0.035956 &  0.876016  & 0.912220 \\
+    DecisionTreeClassifier & 0.026292 &  0.013374 & 0.892276 & 0.882144 \\
+    RandomForestClassifier & 0.100256 &  0.053308 & 0.886179  & 0.928646\\
+    MLPClassifier & 0.073166  & 0.038147 &  0.896341 & 0.928560 \\
+    GaussianNB & 0.099017 &  0.052607 & 0.855691 & 0.914186 \\ \midrule
+    
+    \textbf{Over-Sampled Dataset} \\  \midrule
+    
+    LogisticRegression & 0.111965 &  0.059809 & 0.892276 & 0.933744 \\
+    KNeighborsClassifier &0.625977  & 0.553314 & 0.786585 & 0.892538\\
+    LinearSVC  & 0.118897  & 0.063827 & 0.871951  & 0.924837 \\
+    DecisionTreeClassifier & 0.649036  & 0.661330 & 0.664634 & 0.831985 \\
+    RandomForestClassifier &  0.801992 &  0.884864 & 0.745935  & 0.872869\\
+    MLPClassifier & 0.673009  & 0.631834 & 0.752033 & 0.875552 \\
+    GaussianNB & 0.100591  & 0.053461 & 0.855691 & 0.914668 \\ \midrule
+    
+    \textbf{SMOTE-Sampled Dataset} \\  \midrule
+    
+    LogisticRegression & 0.107417 &  0.057296 & 0.873984  & 0.924311 \\
+    KNeighborsClassifier &0.481362  & 0.358277 & 0.829268 & 0.913002\\
+    LinearSVC  & 0.118380 &  0.063560 & 0.865854  & 0.921825 \\
+    DecisionTreeClassifier & 0.459940  & 0.336584 & 0.747967 & 0.872652 \\
+    RandomForestClassifier &  0.805452  & 0.844639 & 0.782520 & 0.891119\\
+    MLPClassifier & 0.678626 &  0.649623 & 0.731707 & 0.865467 \\
+    GaussianNB & 0.107921 &  0.057627 & 0.855691 & 0.915657 \\
+    
+   \bottomrule
+ \end{tabular}
+ \caption{Baseline Models Results.}
+\label{table:baseline-results}
+\end{table}
+
+\textbf{Key Observations}
+\begin{enumerate}
+\item \textbf{Original dataset results}: The results on the original dataset are fairly standard across the board, with certain classifiers achieving better F1 than others. Random Forest reports the best F1 score. 
+
+\item \textbf{Under-Sampled dataset results}: When the data has been under-sampled, that is, a very large proportion of data has been taken away to balance the classes, we see that precision is dramatically affected. Hence, so are the F1 scores. This observation is perhaps somewhat intuitive given that if we think that we are removing information from the system, the model has less to learn on and hence more misclassifications of the genuine class will occur. 
+
+\item \textbf{Over-Sampled dataset results}: Comparing this set of results with the original dataset, an observation can be made that on the whole, recall scores increase however precision scores suffer. Considering that this form of resampling is duplicating fraud data points, it is understandable why recall would increase. Here it is also observed that tree based classifiers remain high performers. 
+
+\item \textbf{SMOTE dataset results}: Similarly the tree based classifiers perform better than the others. Some of the classifiers performed worse with SMOTE, which is perhaps due to how the model has learned differently from duplicated data vs different synthetic data. However, it is interesting to note that Random Forest and MLP remain consistent, which is a good sign as theoretically we would prefer to use SMOTE given that the data points are different. 
+ 
+\end{enumerate}
+
+\subsubsection{Further Tuning the RandomForest }
+Seeing as Random Forest was clearly a classifier that performed well across the board with this type of application/data, I took some of it's most prominent parameters and performed a grid search, to see how much of an improvement I could get from further tuning. The tuning was done on the SMOTE data, this was because it gave interesting improvements on recall on the dataset, compared with that of the original dataset. This is interesting because for other classifiers, performing something like smote dramatically kills precision. 
+
+The parameters I searched across were: \\
+\begin{enumerate}
+\item \textbf{n\_estimators=\{10, 100, 200\}}
+\item \textbf{criterion=\{'gini', 'entropy'\}}
+\item \textbf{max\_features=\{'auto', 'log2'\}}
+\end{enumerate}
+
+The original F1, precision and recall respectively were: \textbf{0.805452   0.844639  0.782520}.\\
+The best parameters, found by searching were:\\
+\textbf{criterion='entropy', max\_features='auto', n\_estimators=200.}\\
+
+Table~\ref{table:rf-tuning} below shows the results of this tuning.
+
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{cccc}
+    \toprule
+           		& F1 & Precision & Recall \\ \midrule
+    Before Tuning & 0.805452  & 0.844639  & 0.782520  \\
+    After Tuning & 0.827025 & 0.853782 & 0.813008  \\
+   \bottomrule
+ \end{tabular}
+ \caption{Random Forest Parameter Tuning Results.}
+\label{table:rf-tuning}
+\end{table}
+
+
+\subsection{CNN Models}
+
+\subsubsection{CNN Version 1 Results}
+
+Below, I summarise the results of the version 1 models. Table~\ref{table:cnnv1-results-original} shows the results based on using the original dataset and Table~\ref{table:cnnv1-results-smote} shows those using SMOTE as a dataset resampling technique inside the cross-validation.
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC \\ \midrule
+    CNN Model 1 & 0.809863 & 0.881838 & 0.760163 & 0.879979  \\
+    CNN Model 1.2 & 0.821249 & 0.881579 & 0.774390 & 0.887097  \\
+   \bottomrule
+ \end{tabular}
+ \caption{CNN Model 1 Results for Original Dataset.}
+\label{table:cnnv1-results-original}
+\end{table}
+
+%\begin{table}[H]  
+%  \centering
+%  \begin{tabular}{ccccc}
+%    \toprule
+%           		& F1 & Precision & Recall & AUC-ROC\\ \midrule
+%    CNN Model 1 & 0.815548 & 0.898798 & 0.760163  \\
+%    CNN Model 1.2 &  0.826265 & 0.890820 & 0.778455 \\
+%   \bottomrule
+% \end{tabular}
+% \caption{CNN Model 1 Results for Original Dataset (with lower learning rate).}
+%\label{table:cnnv1-results-original-lowlr}
+%\end{table}
+%
+%0.901706  0.645623   0.586726  0.804878 00:02:48.493895
+%CNN Model 1.2  0.906084  0.596756   0.552336  0.815041
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC\\ \midrule
+    CNN Model 1 & 0.645623 &  0.586726 & 0.804878 & 0.901706 \\
+    CNN Model 1.2 &  0.596756  & 0.552336 & 0.815041 & 0.906084\\
+   \bottomrule
+ \end{tabular}
+ \caption{CNN Model 1 Results for SMOTE Dataset.}
+\label{table:cnnv1-results-smote}
+\end{table}
+
+Key observations from these results are that the original dataset performs better, without any resampling involved and that the learning rate parameter of the Adam optimiser plays a key role in the model tuning. In the case of the original dataset results, a learning rate that is a factor of 10 lower than the default value ($lr = 0.00001$) leads to better scores. In the case of the SMOTE data, a higher learning rate was better. 
+
+%\begin{table}[H]  
+%  \centering
+%  \begin{tabular}{cccc}
+%    \toprule
+%           		& F1 & Precision & Recall \\ \midrule
+%    CNN Model 1 & 0.522428  & 0.479291 & 0.762195  \\
+%    CNN Model 1.2 &  0.594949  & 0.525301 & 0.815041 \\
+%   \bottomrule
+% \end{tabular}
+% \caption{CNN Model 1 Results for SMOTE Dataset (with lower learning rate).}
+%\label{table:cnnv1-results-smote-lowlr}
+%\end{table}
+
+\subsubsection{CNN Version 2 Results}
+
+Below, I report the best results for the version 2 model. Table~\ref{table:cnnv2-results-original} shows the results for the default case of the model. This default case uses 100 as the batch-size and 5 for the window-height. These correspond to how many transactions are taken and temporally ordered and the height of the sliding window, respectively. 
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC \\ \midrule
+    CNN Model 2 & 0.674887 & 0.934534 & 0.530247 & 0.952731  \\
+ 
+   \bottomrule
+ \end{tabular}
+ \caption{CNN Model 2 Results for batch-size = 100, window-height = 5.}
+\label{table:cnnv2-results-original}
+\end{table}
+
+Having a recall of $ \approx0.53 $ is not particularly great for the problem at hand, despite the impressive precision of the model. Therefore I do a search across some varying parameter values, to give an indication of the improvements to the results that can be made. Table~\ref{table:cnnv2-results-tuning} reports the results of tuning these two parameters.
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+     (batch-size , window-height) & F1 & Precision & Recall & AUC-ROC \\ \midrule
+    (100 , 5) & 0.674887 & 0.934534 & 0.530247 & 0.952731  \\
+    (200 , 5) & 0.683986 & 0.966952 & 0.531695 & 0.938287 \\
+    (500 , 5) & 0.607998 &1.0 & 0.439607 & 0.924830 \\
+    (100 , 10) & 0.734242 & 0.933769 & 0.608294 & 0.930754 \\
+    (200 , 10) & 0.715631 & 0.934084 & 0.586319 & 0.911789 \\
+    (500 , 10) & 0.62118 & 0.962963 & 0.459854 & 0.902490\\
+   \bottomrule
+ \end{tabular}
+ \caption{CNN Model 2 Results for Varying (batch-size , window-height) Values.}
+\label{table:cnnv2-results-tuning}
+\end{table}
+
+These results indicate that perhaps a smaller batch size but higher window height performs the best. 
+
+\subsection{GAN Models}
+In this section I report findings from the GAN approaches in application to the credit card fraud data. These results were all carried out on the original dataset . It is clear that this is a very experimental use-case with the low reported precision scores seen below, but the effects of network variations are still interesting nonetheless.
+
+\subsubsection{GAN version 1 and it's variations}
+
+In these versions, only the fraud data is being used, as the aim is to see how the GAN learns to model fraudulent transactions and to see what the loss curves look like. Below I describe the results from the variations on the adversarial training. 
+
+\textbf{Version 1.1}
+
+In this version, standard adversarial training is applied. Both the generator and discriminator are trained separately in each epoch.
+
+Figure~\ref{fig:ganv1-losses} below shows the training losses for the model. It can be observed that between 500 and 1500 epochs, the generator improves and learns to fool the discriminator, but after this point the generator's loss slowly diverges as clearly the discriminator overpowers it, after eventually learning the data.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{GANv1-losses}
+\caption{GANv1 Losses Graph.}
+\label{fig:ganv1-losses}
+\end{figure}
+
+As an example of what generated output looks like and what was used to visualise fraud generation, Figure~\ref{fig:ganv1-generatedoutput} below shows the plot that was generated over 6 regular save intervals during training. In this particular case you can see the actual fraud data on the left and the generated fraud on the right, for every 1000 epochs. It can be observed that the model is slowly learning the shape and distribution of the data, albeit not perfectly. 
+
+For the sake of brevity, I will omit future generated output plots for the following versions, but they can be seen in the Appendix. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{GANv1-v17-v10-img_600}
+\caption{GANv1 Generated Output Graph.}
+\label{fig:ganv1-generatedoutput}
+\end{figure}
+
+\textbf{Version 1.2}
+
+In version 1.2, I adapt the adversarial training to a setup whereby the discriminator is pre-trained alone for 500 epochs and then the generator is left to train for the rest. Figure~\ref{fig:ganv1.2-losses} shows the associated losses graph for this.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{{{GANv1.2-losses}}}
+\caption{GANv1.2 Losses Graph.}
+\label{fig:ganv1.2-losses}
+\end{figure}
+
+The resulting graph for this variation is intuitive. After the discriminator is stopped training, the generator simply continues to learn to fool the now static discriminator. You can observe in the graph that the orange loss curve tends to zero very quickly afterwards. Figure~\ref{fig:GANv1.2-v17-v10-img_2} in the appendix shows that the generator concentrates a small subset that are able to fool the discriminator. 
+
+\textbf{Version 1.3}
+
+In version 1.3, the adversarial training was staggered between the two networks. Each network training separately for 500 epochs at a time. Figure~{fig:ganv1.3-losses} shows how the losses fluctuated in this scenario. Figure~\ref{fig:GANv1.3-v17-v10-img_2} in the appendix shows that the generator concentrates a small subset that are able to fool the discriminator. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{{{GANv1.3-losses}}}
+\caption{GANv1.3 Losses Graph.}
+\label{fig:ganv1.3-losses}
+\end{figure} 
+
+\textbf{Version 1.4}
+
+In version 1.4, I used SMOTE data with standard adversarial training. Figure~{fig:ganv1.4-losses} shows how the losses fluctuated in this scenario. It is clear that  Figure~\ref{fig:GANv1.4-v17-v10-img_2} in the appendix shows how even with the increased size of the output data, the generator still focuses on a subset of the actual data distribution. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{{{GANv1.4-losses}}}
+\caption{GANv1.4 Losses Graph.}
+\label{fig:ganv1.4-losses}
+\end{figure} 
+
+\subsubsection{GAN version 2}
+
+On the whole, the results for the second GAN model (using a previous CNN as a generator) showed relatively similar performance to the prior model, exhibiting similar loss and output graphs. It seems to be a common case with this data, that eventually the discriminator simply overpowers the generator in a slow diverging manner. Despite loading weights from the CNN model, the network continues quickly to expose any data distribution that it learns very quickly and after this point the loss just deteriorates as with previous models.
+
+\subsubsection{Semi Supervised Results}
+In this section I report findings from the semi-supervised approach to the GAN in application to the credit card fraud data. I report two main sets of results, one for a smaller amount of epochs and one for a larger amount, to give an indication of the differences in results and also because during experimentation these were key points.
+Table~\ref{table:ganv1-ssl-original} below shows the reported scores for 600 epochs and 6000 epochs respectively. 
+
+\textbf{Variation 1 - Using the original dataset in training (i.e the generator attempts to generate both fraud and non-fraud).}
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC \\ \midrule
+    GANv1-SSL (600 epochs) & 0.00426  &  0.00213 & 0.93893  & 0.564891 \\
+    GANv1-SSL (6000 epochs) & 0.01221   &   0.00615 & 0.83761 & 0.807437  \\
+   
+   \bottomrule
+ \end{tabular}
+ \caption{GANv1-SSL Results for Original Dataset.}
+\label{table:ganv1-ssl-original}
+\end{table}
+
+It is clear from these results that the precision is very poor, despite rather good recall scores. An interesting thing to note from these is that increasing the amount of epochs that the network trains, decreases the recall but improves the precision. Although this improvement seems insignificant, this is just due to the amount of genuine examples compared with that of the true positives (the fraud). I report the confusion matrix for both cases below to show in terms of numbers, the improvement. Figure~\ref{fig:ganv1-ssl-cm-600} shows the confusion matrix for the 600 epochs run and you can see 57507 genuine transactions were misclassified as fraud. That is 81\% of all genuine transactions. In contrast, Figure~\ref{ig:ganv1-ssl-cm-6000} shows the confusion matrix for the 6000 epochs run and the false negative count has decreased to 22\%. In raw numbers, that is over 40,000 transactions that have been now correctly classified. So clearly, the increased epochs performs better and allows the network to learn better which transactions are genuine. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{ganv1-ssl-cm-600}
+\caption{GANv1-SSL Confusion Matrix for 600 epochs.}
+\label{fig:ganv1-ssl-cm-600}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.6]{ganv1-ssl-cm-6000}
+\caption{GANv1-SSL Confusion Matrix for 6000 epochs.}
+\label{fig:ganv1-ssl-cm-6000}
+\end{figure}
+
+Based on this observation it was fitting to try running with a number of epochs a factor of 10 above, to see if this improvement continues. 
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC \\ \midrule
+    GANv1-SSL (30000 epochs) & 0.01365  &  0.00688 & 0.83871  & 0.813788 \\
+    GANv1-SSL (60000 epochs) & 0.01410   &   0.00712 & 0.68293 & 0.759097  \\
+   
+   \bottomrule
+ \end{tabular}
+ \caption{GANv1-SSL increased epochs.}
+\label{table:ganv1-ssl-original-2}
+\end{table}
+
+\textbf{Variation 2 - Similar to version 1, but ensuring the discriminator takes a 50:50 ratio of fraud and genuine transacations, from the real portion of the input.}
+
+Here, when the discriminator takes a half batch of real and generated input, I ensure that the real input has an equal amount of fraud and genuine data. The results for this are as follows:
+
+\begin{table}[H]  
+  \centering
+  \begin{tabular}{ccccc}
+    \toprule
+           		& F1 & Precision & Recall & AUC-ROC \\ \midrule
+    GANv1-SSL (6000 epochs) & 0.00827  &  0.00415 & 0.98496  & 0.771414 \\
+    GANv1-SSL (30000 epochs) & 0.71212  &  0.63514 & 0.81034  & 0.904792 \\
+    GANv1-SSL (60000 epochs) & 0.00993   &   0.00499 & 0.85484 & 0.778857  \\
+   
+   \bottomrule
+ \end{tabular}
+ \caption{GANv1-SSL Variation 2 Results.}
+\label{table:ganv1-ssl-halfhalf}
+\end{table}
+
+Table~\ref{table:ganv1-ssl-halfhalf} shows that there is a sweet spot at around 30000 epochs in which the classification portion of the GAN performs reasonably well in comparison to some of the results seen previously in the project. It also indicates how performance can fluctuate. 
+
+\textbf{Variation 3 - Fraud data only, but classifying on both genuine and fraud.}
+In this case, the network was not useful at all. Due to the fact that the network learns the shape of classification of fraud, it simply misclassified all benign transactions even for high epoch numbers. 
+
 
 % Conclusion
 \chapter{Conclusions}
 
-\begin{enumerate}
-\item Can you apply DL architectures to this problem? Yes, you can apply them, good/bad? 
-\item What can you compare it to, is it useful, how does it
-compare
-\item What could the recommendation be, would you recommend to use DNN
-\end{enumerate}
+The project was a success in that the work set out to be completed, was achieved, with extra work and experimentation than first anticipated. It was also an incredible learning process about the use of these types of models and how they behave.
+To conclude, I will simply answer the primary question that the project started out with: \textbf{Can we apply these Deep Learning architectures to this problem?}. The answer, is yes we can apply them. The next thing would be to consider whether it was good or bad in applying them.
+
+ I think it is clear that using convolutional based networks definitely has a place in the time-series and credit card fraud domain. This stems from both previous seen success, as mentioned with WaveNet and also from this project's experimentation with the CNN models applied to this data. With deep learning architectures like this, there are many variables and methods that can be undertaken to further tune and improve performance of the models. In this project, I scratched the surface of these but with further experimentation I suspect we could achieve even more comparable results. 
+
+As for the GAN models, I do not think that applying these helps a great deal in the problem space. Although an interesting experiment, which showed that we can sample from the original dataset and train a model to learn what fraudulent transactions look like (with reasonable success), I suspect this would be limited when actually applying this to the real-world problem of credit card fraud detection. There is a obviously a fixed amount of information in a dataset and a theoretically optimal classifier would use all of that information. The GAN trained on the dataset does not actually create new information, it just tries to learn best the distribution of the original data. Therefore interesting hypothesises such as ''We use a GAN to generate new fraud with which we can train other models with, to solve imbalance problems?'' appear to be negative. 
+Using the GAN as a semi-supervised learning classifier was a very intriguing addition to the project and highlighted that in certain conditions, there was indication that this setup could work (in reference variation 2). However we have to also consider this in comparison to what we can already achieve with the 'simpler' baseline classifiers I started the project with. GANs would require a ton more data and would need to train for a very long time to uncover proportionally smaller incremental improvements. I therefore conclude that in this case it is perhaps better to expend effort tuning parameters and optimising something like the Random Forest Classifier, that we saw early on. 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -743,6 +1157,39 @@ compare
 \bibliographystyle{ieeetr}
 \bibliography{references}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% the appendix
+
+\appendix 
+
+\chapter{GAN Generated Outputs}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{{{GANv1.2-v17-v10-img_2}}}
+\caption{GANv1.2 Generated Outputs for every 1000 epochs.}
+\label{fig:GANv1.2-v17-v10-img_2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{{{GANv1.3-v17-v10-img_2}}}
+\caption{GANv1.3 Generated Outputs for every 1000 epochs.}
+\label{fig:GANv1.3-v17-v10-img_2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.4]{{{GANv1.4-v17-v10-img_2}}}
+\caption{GANv1.4 Generated Outputs for every 1000 epochs.}
+\label{fig:GANv1.4-v17-v10-img_2}
+\end{figure}
+
+\chapter{Project Proposal}
+
+\includepdf[pages=-]{proposal.pdf}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \end{document}

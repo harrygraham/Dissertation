@@ -34,19 +34,36 @@
 \contentsline {subsection}{\numberline {3.3.3}CNN Version 2}{24}{subsection.3.3.3}
 \contentsline {subsubsection}{Overview}{24}{section*.25}
 \contentsline {subsubsection}{Preprocessing}{25}{section*.28}
+\contentsline {subsubsection}{Time-Series Cross-Validation}{26}{section*.29}
 \contentsline {section}{\numberline {3.4}Generative Adversarial Network Models}{26}{section.3.4}
 \contentsline {subsection}{\numberline {3.4.1}Overview}{26}{subsection.3.4.1}
-\contentsline {subsection}{\numberline {3.4.2}Adversarial Training}{27}{subsection.3.4.2}
-\contentsline {subsection}{\numberline {3.4.3}Utility Functions}{29}{subsection.3.4.3}
-\contentsline {subsection}{\numberline {3.4.4}GAN Version 1 - Dense Generator}{29}{subsection.3.4.4}
-\contentsline {subsubsection}{Leaky ReLUs}{30}{section*.29}
-\contentsline {subsubsection}{The Adam Optimiser}{30}{section*.30}
-\contentsline {subsection}{\numberline {3.4.5}GAN Version 2 - Previous CNN Generator}{30}{subsection.3.4.5}
-\contentsline {subsection}{\numberline {3.4.6}Semi-Supervised Learning for Classification}{31}{subsection.3.4.6}
-\contentsline {chapter}{\numberline {4}Evaluation}{32}{chapter.4}
-\contentsline {section}{\numberline {4.1}Evaluation Methodology}{32}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Metrics}{32}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{33}{subsection.4.1.2}
-\contentsline {section}{\numberline {4.2}Results Overview}{33}{section.4.2}
-\contentsline {chapter}{\numberline {5}Conclusions}{34}{chapter.5}
-\contentsline {chapter}{Bibliography}{35}{Item.19}
+\contentsline {subsection}{\numberline {3.4.2}Adversarial Training}{28}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.4.3}GAN Version 1 - Dense Generator}{29}{subsection.3.4.3}
+\contentsline {subsubsection}{Leaky ReLUs}{30}{section*.30}
+\contentsline {subsubsection}{The Adam Optimiser}{30}{section*.31}
+\contentsline {subsubsection}{Training Variations}{31}{section*.32}
+\contentsline {subsection}{\numberline {3.4.4}GAN Version 2 - Previous CNN Generator}{31}{subsection.3.4.4}
+\contentsline {subsection}{\numberline {3.4.5}Semi-Supervised Learning for Classification}{31}{subsection.3.4.5}
+\contentsline {subsubsection}{Problems with GANs}{32}{section*.34}
+\contentsline {chapter}{\numberline {4}Evaluation}{33}{chapter.4}
+\contentsline {section}{\numberline {4.1}Evaluation Methodology}{33}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Metrics}{33}{subsection.4.1.1}
+\contentsline {subsubsection}{Precision and Recall}{33}{section*.35}
+\contentsline {subsubsection}{F1-Score}{34}{section*.36}
+\contentsline {subsubsection}{Confusion Matrix}{34}{section*.37}
+\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{35}{subsection.4.1.2}
+\contentsline {section}{\numberline {4.2}Results Overview}{35}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Baseline Models}{35}{subsection.4.2.1}
+\contentsline {subsubsection}{Results Table}{35}{section*.39}
+\contentsline {subsubsection}{Further Tuning the RandomForest }{37}{section*.41}
+\contentsline {subsection}{\numberline {4.2.2}CNN Models}{38}{subsection.4.2.2}
+\contentsline {subsubsection}{CNN Version 1 Results}{38}{section*.43}
+\contentsline {subsubsection}{CNN Version 2 Results}{38}{section*.46}
+\contentsline {subsection}{\numberline {4.2.3}GAN Models}{39}{subsection.4.2.3}
+\contentsline {subsubsection}{GAN version 1 and it's variations}{39}{section*.49}
+\contentsline {subsubsection}{GAN version 2}{43}{section*.55}
+\contentsline {subsubsection}{Semi Supervised Results}{43}{section*.56}
+\contentsline {chapter}{\numberline {5}Conclusions}{46}{chapter.5}
+\contentsline {chapter}{Bibliography}{47}{chapter.5}
+\contentsline {chapter}{\numberline {A}GAN Generated Outputs}{48}{appendix.A}
+\contentsline {chapter}{\numberline {B}Project Proposal}{52}{appendix.B}
