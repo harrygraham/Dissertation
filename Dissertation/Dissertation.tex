@@ -93,7 +93,7 @@ College:            & \bf Christ's College \\
 Project Title:      & \bf Deep Learning Techniques for Credit Card Fraud \\
 			 & \bf Detection \\
 Examination:        & \bf Computer Science Tripos -- Part II, June 2018 \\
-Word Count:         &  \bf 10,709 \\
+Word Count:         &  \bf 10,704 \\
 Project Originators: & H.~Graham \& B.~Dimanov \\
 Supervisors:         & B.~Dimanov \& Dr M.~Jamnik
 \end{tabular}
@@ -181,7 +181,7 @@ The main success criteria of the project is outlined as follows:
    \end{itemize}
 \end{enumerate}
 
- These were all done more or less in order. Some work overlapped, namely work on auxiliary functionality to allow appropriate cross validation or data preparation etc. More details on specifics is outlined in the implementation chapter. 
+ These were all done more or less in order. Some work overlapped, namely work on auxiliary functionality to allow appropriate cross-validation or data preparation etc. More details on specifics are outlined in the implementation chapter. 
   
 \subsection{Tools and Technologies Used} \label{tools}
 
@@ -215,7 +215,7 @@ In terms of technologies, I had little prior experience with SKLearn and Keras/T
 \section{Convolutional Neural Networks}
 Convolutional Neural Networks\cite{DBLP:journals/corr/SimonyanZ14a} are a class of deep artificial neural networks, that have seen success in image recognition and other computer vision areas. Unlike typical neural networks, CNNs exploit spatial locality by shared weights. 
 
-A CNN typically consists of an input layer, multiple hidden layers and an output layer. Hidden layers are usually convolutional layers, pooling layers and normalisation layers. 
+A CNN typically consists of an input layer, multiple hidden layers, and an output layer. Hidden layers are usually convolutional layers, pooling layers, and normalisation layers. 
 
 \textbf{Convolutional Layer:}\\
 A Convolutional Layer has the following important parameters: 
@@ -247,7 +247,7 @@ Fully Connected Layers (FCs) take all the feature maps from a convolutional laye
 
 
 \section{Generative Adversarial Networks}
-GAN is a framework proposed by Ian Goodfellow, Yoshua Bengio and others in 2014\cite{2014arXiv1406.2661G}. The idea is that we have two networks: a generator and a discriminator. The objective of the generator network is to produce a specific form of data from random noise. This could be an image, or in this case a fraudulent transaction vector. The discriminator takes in real-life data (from the training set) and also the generated data from the generator network. The objective of the discriminator is to determine whether the current input is real or generated. Effectively, these two networks play a game with each other: the goal of the generator is to fool the discriminator whilst the goal of the discriminator is to catch out the generator. This continues until each network does not improve any more and the GAN stabilises. In practice, however, an alternative outcome is simply that one network is inherently stronger and will overpower the other. Figure 2.1 represents an overview of a GAN network.
+GAN is a framework proposed by Ian Goodfellow, Yoshua Bengio and others in 2014\cite{2014arXiv1406.2661G}. The idea is that we have two networks: a generator and a discriminator. The objective of the generator network is to produce a specific form of data from random noise. This could be an image, or in this case a fraudulent transaction vector. The discriminator takes in real-life data (from the training set) and also the generated data from the generator network. The objective of the discriminator is to determine whether the current input is real or generated. Effectively, these two networks play a game with each other: the goal of the generator is to fool the discriminator whilst the goal of the discriminator is to catch out the generator. This continues until each network does not improve anymore and the GAN stabilises. In practice, however, an alternative outcome is simply that one network is inherently stronger and will overpower the other. Figure 2.1 represents an overview of a GAN network.
 
 \begin{figure}[!htbp]
 
@@ -281,14 +281,14 @@ The steps for training a GAN can be outlined as followed:
   \item Repeat the above for n epochs until neither network makes any further improvements
 \end{enumerate}
 
-In summary, we alternate between training of the discriminator; to correctly determine real or fake data, and training the generator; on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
+In summary, we alternate between the training of the discriminator; to correctly determine real or fake data, and training the generator; on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
 
 \section{Machine Learning Evaluation Practices}
 Here I describe some of the main machine learning evaluation concepts that underpin the implementation of this project. 
 
 \subsection{Train and Test Splits}
 
-When training a machine learning model, it will often report some metrics or loss function to reflect how the performance increased during the training process. The problem with this, is that our model may not perform well on \textbf{unseen} data. In other words, it might not \textbf{generalise} well. To overcome this, it is good practise to preserve a testing portion of the data, called the test set, that is not used in the training process. The test set is then used to evaluate how the model performs after training. 
+When training a machine learning model, it will often report some metrics or loss function to reflect how the performance increased during the training process. The problem with this is that our model may not perform well on \textbf{unseen} data. In other words, it might not \textbf{generalise} well. To overcome this, it is good practise to preserve a testing portion of the data, called the test set, that is not used in the training process. The test set is then used to evaluate how the model performs after training. 
 
 Let's say we have \textbf{\textit{m}} examples $ \mathbf { x } _ { 1} ,\mathbf { x } _ { 2} ,\dots ,\mathbf { x } _ { m }$ each in $\mathbb { R } ^ { n }$. In a supervised learning problem, we also have \textbf{\textit{m}} labels $\left\{ y _ { 1} ,y _ { 2} ,\dots ,y _ { m } \right\}$ in a set \textbf{\textit{Y}}.\\
 In machine learning we wish to find a hypothesis $h : \mathbb { R } ^ { n } \rightarrow Y$ that is defined by a vector of weights \textbf{\textit{w}}. It is then common to write $h _ { w } ( x )$.\\
@@ -304,7 +304,7 @@ We define a training set as $\mathbf{s} = [(\mathbf { x } _ { 1}, \mathbf { y } 
 
 \subsection{Cross-validation}
 
-Cross-validation takes train-test splits a step further. The hypothesis of our model may in fact generalise and perform better on some portions of the data over others and thus performing just one split, may not give the most confident results. Also, when performing these train-test splits, the element of randomness in the split can work against us as even if we average this process say 3 times, it is likely that there is some overlap in the runs and we are not really using the data available to its full capacity. Figure~\ref{fig:k-fold-cross-val} represents a type of cross-validation called K-Fold. This is where the the data is split into K sections and with every iteration, the model trains on $K-1$ folds and tests on the remaining fold. This ensures that all the data is beings used to its full extent and that we test on every portion of the data to get the best estimation for the generalisability of the model.
+Cross-validation takes train-test splits a step further. The hypothesis of our model may in fact generalise and perform better on some portions of the data over others and thus performing just one split, may not give the most confident results. Also, when performing these train-test splits, the element of randomness in the split can work against us as even if we average this process say 3 times, it is likely that there is some overlap in the runs and we are not really using the data available to its full capacity. Figure~\ref{fig:k-fold-cross-val} represents a type of cross-validation called K-Fold. This is where the data is split into K sections and with every iteration, the model trains on $K-1$ folds and tests on the remaining fold. This ensures that all the data is beings used to its full extent and that we test on every portion of the data to get the best estimation for the generalisability of the model.
 
 \begin{figure}[H]
 
@@ -331,7 +331,7 @@ The three main methods I explore are:
 Undersampling is the process of reducing the majority class down to a lower amount, to balance more with the minority class. This can be achieved by randomly removing samples until the ratio is 50:50 or another specified amount. 
 
 \subsubsection{Oversampling}
-Oversampling is the process of increasing the minority class by adding data-points, until a satisfactory ratio of classes is achieved. Machine learning models often benefit from more training data and so oversampling mitigates a problem of undersampling whereby the amount of data our models have to learn on, is restricted. 
+Oversampling is the process of increasing the minority class by adding data-points until a satisfactory ratio of classes is achieved. Machine learning models often benefit from more training data and so oversampling mitigates a problem of undersampling whereby the amount of data our models have to learn on, is restricted. 
 I explore two types of oversampling and address the problems that can occur.
 
 \paragraph{Duplicate Oversampling} 
@@ -352,7 +352,7 @@ Oversampling techniques affect the validity of the cross-validation process. It 
 
 Looking at Figure~\ref{fig:oversample-before}, the dataset is oversampled and passed to cross-validation (left-to-right). Notice that inside the cross-validation loop, the current train-test split means that some of the oversampled minority class (node 3) is in both the training and testing portions. This means that our model would have seen this data during the training process and will therefore have a bias during the testing and evaluation phase as it already knows how to classify this data. 
 
-It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Figure~\ref{fig:oversample-after-1} and Figure~\ref{fig:oversample-after-2} represent the correct way to handle this, for $n=1$ and $n=2$ respectively. For every iteration of the loop, we \textbf{first} split the data into train-test first and then oversample the training data fold only. This preserves the testing fold, while keeping a portion of the original dataset untouched for evaluation. Using this methodology is crucial and a lot more effective in testing the generalisability of a model.
+It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Figure~\ref{fig:oversample-after-1} and Figure~\ref{fig:oversample-after-2} represent the correct way to handle this, for $n=1$ and $n=2$ respectively. For every iteration of the loop, we \textbf{first} split the data into train-test first and then oversample the training data fold only. This preserves the testing fold while keeping a portion of the original dataset untouched for evaluation. Using this methodology is crucial and a lot more effective in testing the generalisability of a model.
 
 \begin{figure}[H]
 \centering
@@ -383,7 +383,7 @@ It is therefore crucial that this is adapted such that any oversampling occurs i
 \textbf{The Data}\\
 
 The data I use in this project is a dataset from a research collaboration of Worldline and the Machine Learning Group (http://mlg.ulb.ac.be) of ULB (University of Brussels) on big data mining and fraud detection. This was also a popular dataset on Kaggle\footnote{\href{kaggle.com}{kaggle.com}}, for some time.\\
-The datasets contains transactions made by credit cards in September 2013 by european cardholders. The time span for transactions are over in two days and there are 492 frauds out of 284,807 transactions. This makes the set highly unbalanced, the positive class (frauds) account for 0.172\% of all transactions.
+The dataset contains transactions made by credit cards in September 2013 by European cardholders. The time span of transactions is over two days and there are 492 frauds out of 284,807 transactions. This makes the set highly unbalanced, the positive class (frauds) account for 0.172\% of all transactions.
  
 The transactions are in the form of single vectors, with 30 features and the associated class labels (1 or 0). Twenty-eight of these features are results from PCA (Principal Component Analysis) and the other two are Time and Amount. 
 
@@ -403,9 +403,9 @@ I checked the data to see if any values were missing, or null. This was to ensur
 
 \subsection{Cross Validation Function}
 
-Defining my own cross-validation function early on was a crucial step in this project. As explained briefly in the preparation chapter, the way in which cross-validation is performed is very important to ensure no overfitting occurs. As far as implementation is concerned, the built in SKLearn cross-validation function does not provide the ability for changing the evaluation metrics or preserving the validity of the sampling. I wanted very specific metrics and the ability to output in a form convenient to me. Also, I needed to resample data in the correct place which meant I needed to define my own function, based on the standard library, which uses Stratified KFold. This essentially means that the splitting of the data in each fold of the KFold procedure, contains at least some portion of the underrepresented class. This is important as it would be very common that some folds do not contain any of the minority class. 
+Defining my own cross-validation function early on was a crucial step in this project. As explained briefly in the preparation chapter, the way in which cross-validation is performed is very important to ensure no overfitting occurs. As far as implementation is concerned, the built-in SKLearn cross-validation function does not provide the ability for changing the evaluation metrics or preserving the validity of the sampling. I wanted very specific metrics and the ability to output in a form convenient to me. Also, I needed to resample data in the correct place which meant I needed to define my own function, based on the standard library, which uses Stratified KFold. This essentially means that the splitting of the data in each fold of the KFold procedure contains at least some portion of the underrepresented class. This is important as it would be very common that some folds do not contain any of the minority class. 
 
-The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1}, which simply reports the precision, recall and f1-score for predicted values. The input is the set of predicted values and the set of true values. The output is the calculated metrics of interest. I use this inside my function to report the metrics we are interested in; something I could not do originally. 
+The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1}, which simply reports the precision, recall, and f1-score for predicted values. The input is the set of predicted values and the set of true values. The output is the calculated metrics of interest. I use this inside my function to report the metrics we are interested in; something I could not do originally. 
 
 \begin{algorithm}[!htbp]
 \caption{Cross-Validation function }\label{alg:cross-val}
@@ -452,14 +452,14 @@ This is something I could then use for varying \textbf{Resample} methods, seen o
 \subsection{Cross Validation the Wrong Way}
 
 \textbf{Test\_Train\_Split vs Custom cross\_val\_score using KFold}\\
-This concerns the underlying approach for the cross validation loop. SKLearn's test\_train\_split function splits the data into train and test portions. We can then oversample our training data, fit the model, and make predictions using the test set.
+This concerns the underlying approach for the cross-validation loop. SKLearn's test\_train\_split function splits the data into train and test portions. We can then oversample our training data, fit the model, and make predictions using the test set.
 One possibility is to simply do this multiple times and average the results.
 I showed in my experiments that this approach will give better results than expected, in comparison with KFold methods. The reason for this is due to the nature of test\_train\_split and its randomness, which introduces a slight bias.
 
-Test\_train\_split allows you to randomly split your data, by giving a parameter that specifies the ratio. However as the split is random, it is likely that there will be overlap in the CV iterations as to which data points are put in the test set. In other words, values selected during one iteration, could be selected again during another iteration.
-The consequences of this means that the model may not be exposed to particular portions of the data whereby it does not generalise well and these are not captured in the results. Also, the way that test\_train\_split operates, doe not make maximal use of the data we have.
+Test\_train\_split allows you to randomly split your data, by giving a parameter that specifies the ratio. However as the split is random, it is likely that there will be overlap in the CV iterations as to which data points are put in the test set. In other words, values selected during one iteration could be selected again during another iteration.
+The consequences of this mean that the model may not be exposed to particular portions of the data whereby it does not generalise well and these are not captured in the results. Also, the way that test\_train\_split operates, does not make maximal use of the data we have.
 
-I ran my classifiers using this approach too, as a means of comparison with what can go wrong and give invalid results. The correct way, as detailed above, uses KFold cross validation to split the data during a loop and to do any customisations or resampling inside this loop.
+I ran my classifiers using this approach too, as a means of comparison with what can go wrong and give invalid results. The correct way, as detailed above, uses KFold cross-validation to split the data during a loop and to do any customisations or resampling inside this loop.
 
 \subsection{Resampling functions}
 To implement resampling functions I made use of the \textbf{imbalanced-learn}\cite{JMLR:v18:16-365} library. This is an API that focused on methods for unbalanced datasets, including oversampling and SMOTE techniques. They have written functions that do exactly what I needed so I made use of their work in this small part of my project. 
@@ -469,8 +469,8 @@ I created simple functions in the form of:\\
 \textbf{Output: X-res, Y-res}\\
 Where X-res and Y-res are the resampled X and Y data. \\
 
-For \textbf{Duplicate Oversampling} I used \textbf{imblearn.over\_sampling.RandomOverSampler.} This does as described Chapter 2. The method randomly selects a datapoint and duplicates it, or in other words 'selecting random data points, with replacement'.
-For \textbf{SMOTE}, I used \textbf{imblearn.over\_sampling.SMOTE}. The default parameter of k\_neighbors was used, which is a value of 5 and it suitable for this use. 
+For \textbf{Duplicate Oversampling} I used \textbf{imblearn.over\_sampling.RandomOverSampler.} This does as described Chapter 2. The method randomly selects a data point and duplicates it, or in other words 'selecting random data points, with replacement'.
+For \textbf{SMOTE}, I used \textbf{imblearn.over\_sampling.SMOTE}. The default parameter of k\_neighbors was used, which is a value of 5 and is suitable for this use. 
 For \textbf{Under-Sampling}, I created a small function myself that makes use of NumPy random to randomly select indexes from the majority class, in order to remove data points and bring the ratio down.
 
 \subsection{Collecting Results for All Classifiers}
@@ -532,7 +532,7 @@ Figure~\ref{fig:cnnv1} shows the outline of the first CNNv1 network.
 The input layer takes a transactional vector. Then, a convolutional layer performs convolutions on the input data, using 30x1 kernels, of which there are 256, differently initialised. This creates 256 1x1 outputs. By flattening these outputs, I then introduce a fully connected layer, which essentially means that every node is connected to every other node, between the flattened layer and the subsequent dense layer of which I used 300 nodes. Then there is a softmax output layer which takes the weighted sum of the fully connected layer and also has an activation, as with usual neural network architectures and gives us our predictions, corresponding to Fraud or Genuine.
 
 \subsubsection{Version 1-2}
-In an attempt to take this model a little further, I tried a variation whereby I added an extra convolutional layer and also an extra dense layer in the fully connected section. This was to give an indication of effect of additional layers would have.
+In an attempt to take this model a little further, I tried a variation whereby I added an extra convolutional layer and also an extra dense layer in the fully connected section. This was to give an indication of the effect that additional layers would have.
 
 The results of this version were also reported and compared with Version 1-1. 
 
@@ -561,9 +561,9 @@ The gradient of sigmoid is:
 $$S ^ { \prime } ( t ) = S ( t ) ( 1.0- S ( t ) )$$
 
 \textbf{Vanishing Gradient Problem}
-During gradient based learning methods, a weight update is back-propagated through a network. The gradient of a sigmoid activation will be close to zero if the output is close to the tail ends of 0 or 1 (saturated neurons). This is a problem when there are multiple layers to the network as multiplication of near-zero quantities at each layer results in a 'vanishing gradient'. This means that even large changes, will attenuate through the network and result in affecting the output less. The hyperbolic tangent function activation also has this saturation problem. 
+During gradient-based learning methods, a weight update is back-propagated through a network. The gradient of a sigmoid activation will be close to zero if the output is close to the tail ends of 0 or 1 (saturated neurons). This is a problem when there are multiple layers to the network as multiplication of near-zero quantities at each layer results in a 'vanishing gradient'. This means that even large changes, will attenuate through the network and result in affecting the output less. The hyperbolic tangent function activation also has this saturation problem. 
 
-The ReLU activation however, has a constant gradient. This means there is no attenuation in the back propagated signal and actually training is faster. The mathematical calculations are easier too, as the ReLU does not use exponentials. In the ImageNet\cite{krizhevsky2012imagenet} paper by Krizhevsky et al, they show that networks with ReLUs consistently learn several times faster than equivalents with saturating neurons (for example, with a tanh layer).
+The ReLU activation, however, has a constant gradient. This means there is no attenuation in the back propagated signal and actually, training is faster. The mathematical calculations are easier too, as the ReLU does not use exponentials. In the ImageNet\cite{krizhevsky2012imagenet} paper by Krizhevsky et al, they show that networks with ReLUs consistently learn several times faster than equivalents with saturating neurons (for example, with a tanh layer).
 
 \subsection{CNN Version 2}
 
@@ -581,7 +581,7 @@ A window of height 5, can be positioned in 96 unique positions over the batch. A
 \end{figure}
 
 
-Figure~\ref{fig:cnnv2-2} then shows the remainder of the model. The output from the convolutions are flattened and hooked up to a fully connected layer. Then the softmax output layer, as before, to output our classification probabilities. 
+Figure~\ref{fig:cnnv2-2} then shows the remainder of the model. The outputs from the convolutions are flattened and hooked up to a fully connected layer. Then the softmax output layer, as before, to output our classification probabilities. 
 
 \begin{figure}[!htbp]
 \centering
@@ -591,9 +591,9 @@ Figure~\ref{fig:cnnv2-2} then shows the remainder of the model. The output from 
 \end{figure}
 
 \subsubsection{Causal Padding}
-The choice between the type of padding to have on the model, is an important one. By nature of time-series prediction, the prediction at time step t depends on the time steps previous to it. Therefore depending on the size of the kernel being used, it can be the case that the vectors at the beginning are not fully utilised. In order to work around this, causal padding is used. This causal padding approach is similar to section 2.1 on dilated causal convolutions in the WaveNet\cite{DBLP:journals/corr/OordDZSVGKSK16} paper, differing in application. 
+The choice between the type of padding to have on the model is an important one. By nature of time-series prediction, the prediction at time step t depends on the time steps previous to it. Therefore depending on the size of the kernel being used, it can be the case that the vectors at the beginning are not fully utilised. In order to work around this, causal padding is used. This causal padding approach is similar to section 2.1 on dilated causal convolutions in the WaveNet\cite{DBLP:journals/corr/OordDZSVGKSK16} paper, differing in application. 
 
-Effectively, this means that although theoretically the number in the output layer of the convolutions should be 96, as described, it is actually 100. This is due to padding the start of the batch to ensure that the first 4 transactions are handled appropriately. 
+Effectively, this means that although theoretically, the number in the output layer of the convolutions should be 96, as described, it is actually 100. This is due to padding the start of the batch to ensure that the first 4 transactions are handled appropriately. 
 
 \subsubsection{Preprocessing}
 
@@ -605,7 +605,7 @@ Listing~\ref{lst:cnnv2-batchreshape} outlines a function that packs up this tran
 
 \subsubsection{Time-Series Cross-Validation}
 
-Due to the fact that this CNN model specifically exploits the temporal ordering of the transactions, the usual method of cross-validating becomes insufficient. This is because during the usual KFold procedure, the data will be split randomly and of course this will violate temporal ordering. In general, cross-validating for predictive modelling like this is tricky, but there are a ways of doing it. I outline one here in my implementation. 
+Due to the fact that this CNN model specifically exploits the temporal ordering of the transactions, the usual method of cross-validating becomes insufficient. This is because during the usual KFold procedure, the data will be split randomly and of course this will violate temporal ordering. In general, cross-validating for predictive modelling like this is tricky, but there are ways of doing it. I outline one here in my implementation. 
 
 The approach is to split the data as usual (perhaps a 70:30 split), but keeping the temporal ordering such that every transaction after the cutoff point (i.e in the testing set) has a transaction with time $T > T_{n} $, where $T_{n}$ is the last transaction of the training set. When transactions are ordered by time, in the real world we often predict only the next one or two time steps (think of stock market fluctuations). We can use this therefore to average results across the size of the testing set, progressively predicting less test data. 
 
@@ -615,16 +615,16 @@ $$ [1] [2] [3] [4]  --- [5] [6] [7] , \hspace{5mm}  n=1$$
 $$ [1] [2] [3] [4] [5] --- [6] [7] ,\hspace{5mm}  n=2$$
 $$ [1] [2] [3] [4] [5] [6] --- [7] ,\hspace{5mm}  n=3$$
 
-The implementation of this is through wrapping the model creation into it's own function, like previously, but also taking parameters to make the batch-size and window-height dynamic. Inside the cross-validation function itself, the preprocessing, model creation and model predictions are all wrapped up together. There is also another auxiliary function that generates the time-series split of the data by ordering it and splitting it at a specified ratio, given to the function as a parameter. Inside the cross-validation, this function is called with decreasing value, to return a progressively larger training set and smaller test set with every iteration. 
+The implementation of this is through wrapping the model creation into its own function, like previously, but also taking parameters to make the batch-size and window-height dynamic. Inside the cross-validation function itself, the preprocessing, model creation and model predictions are all wrapped up together. There is also another auxiliary function that generates the time-series split of the data by ordering it and splitting it at a specified ratio, given to the function as a parameter. Inside the cross-validation, this function is called with decreasing value, to return a progressively larger training set and smaller test set with every iteration. 
 
 \section{Generative Adversarial Network Models}
 
 \subsection{Overview}
 As described in the preparation chapter, GANs are essentially two networks that play a game with each other, each trying to reduce their own loss function. 
 
-The three major components of a GAN are the generator network, the discriminator network and the combined network training process. Below, I outline the steps needed in the adversarial training stage of the GAN, as well as various utilities that were important to the setup and running of the models. 
+The three major components of a GAN are the generator network, the discriminator network, and the combined network training process. Below, I outline the steps needed in the adversarial training stage of the GAN, as well as various utilities that were important to the setup and running of the models. 
 
-Then this section outlines the three major variations in which I experimented; two variations on the generator network and then an attempt at incorporating a semi-supervised learning approach to treat the GAN as a classifier. This came about due to the fact that GANs in their common use case, display how the networks perform with regard to their loss functions and also can display the intermediate generations (like in the classic MNIST dataset) to visually inspect how the GAN is performing. Seeing as the data I am working with, is inherently used in classification problems, it is of interest to experiment with using the GAN as so. However, simply investigating how the generator performs at constructing fraud-like data is also very interesting, this could have potential of helping the domain create more data on which to train with. 
+Then this section outlines the three major variations in which I experimented; two variations on the generator network and then an attempt at incorporating a semi-supervised learning approach to treat the GAN as a classifier. This came about due to the fact that GANs in their common use case, display how the networks perform with regard to their loss functions and also can display the intermediate generations (like in the classic MNIST dataset) to visually inspect how the GAN is performing. Seeing as the data I am working with, is inherently used in classification problems, it is of interest to experiment with using the GAN as so. However, simply investigating how the generator performs at constructing fraud-like data is also very interesting, this could have the potential of helping the domain create more data on which to train with. 
 
 Below, listing~\ref{lst:gan-classdefinition} shows the abstract definition of the GAN class, in which I wrapped up all of the main functions of the model. This definition shows the prominent functions with short descriptions. 
 \lstinputlisting[language=Python, caption= GAN Class Definition., label={lst:gan-classdefinition}]{code-snippets/GAN-classdefinition.py}
@@ -669,37 +669,37 @@ The training procedure of the GAN is a crucial component. Unlike other models in
 \end{algorithmic}
 \end{algorithm}
 
-The Adversarial Training algorithm shown is a very high level outline of the procedure. Some lines in particular contain a lot under the hood:
+The Adversarial Training algorithm shown is a very high-level outline of the procedure. Some lines in particular contain a lot under the hood:
 
 \textbf{Line 3: Reshape training data into tensors}. This line takes the training data and expands the dimensions in order to satisfy the 3D tensor requirement of the models. This is due to TensorFlow being the underlying engine. 
 
-\textbf{Line 13: Format labels into categorical shape}. Because I used categorical cross-entropy loss in the combined GAN model, the labels of the data needs to be in a binary matrix representation. Targets are in categorical format (e.g. if you have 2 classes, the target for each sample should be a 2-dimensional vector that is all-zeros except for a 1 at the index corresponding to the class of the sample).
+\textbf{Line 13: Format labels into categorical shape}. Because I used categorical cross-entropy loss in the combined GAN model, the labels of the data need to be in a binary matrix representation. Targets are in categorical format (e.g. if you have 2 classes, the target for each sample should be a 2-dimensional vector that is all zeros except for a 1 at the index corresponding to the class of the sample).
 
 \textbf{Line 20: Train the Combined model using this noise and labels}. As outlined in the subsections below, in order to train the generator, we need the discriminator too and thus this is a combined model. The model must be carefully defined so that the loss of the combined model incorporates the loss of the generator. Essentially the networks are stacked together. This is also why in \textbf{Line 15}, we set the discriminator to untrainable (i.e frozen) so that the current state of the network can be used when training the generator in order to allow it to improve. 
 
 \textbf{Line 22: Save and Append losses of both networks}. This line covers the work of saving the loss of each network with every epoch, in order to do things like plotting the loss curves for visual evaluation.
 
-\textbf{Line 25: Save current generated output}. When the save interval is reached, a utility function is called that I implemented to do a number of things. One of which was to use the current state of the generator to take some random noise and generate an output. This is so that we can visualise what the current output looks like at this epoch. This function also includes the various plotting utilities that builds up the final figure which shows generated output for regular training intervals. 
+\textbf{Line 25: Save current generated output}. When the save interval is reached, a utility function is called that I implemented to do a number of things. One of which was to use the current state of the generator to take some random noise and generate an output. This is so that we can visualise what the current output looks like at this epoch. This function also includes the various plotting utilities that build up the final figure which shows generated output for regular training intervals. 
 
 Notice also, how the discriminator is trained on real and fake data separately, to give a stable and clear separation of the data.
 
 \subsection{GAN Version 1 - Dense Generator}
 
-In the first GAN version I focus on creating the generator network from scratch, instead of importing one of the previous CNN models. The dense generator network takes in random noise as input, has a series of hidden dense layers and includes regularisation layers such as Leaky ReLU activations and Batch Normalisation.
+In the first GAN version, I focus on creating the generator network from scratch, instead of importing one of the previous CNN models. The dense generator network takes in random noise as input, has a series of hidden dense layers and includes regularisation layers such as Leaky ReLU activations and Batch Normalisation.
 
 An outline of the dense generator network can be viewed as:
 \lstinputlisting[language=Python, caption= GAN v1 - Dense Generator., label={lst:ganv1-generator}]{code-snippets/ganv1-generator.py}
 
 
 \subsubsection{Leaky ReLUs}
-I use leaky ReLU to allow gradients to flow backwards through the layer unimpeded. TensorFlow does not provide an operation for leaky ReLUs, However the Keras API has a nice wrapper for adding this as a layer. The alpha parameter is essentially how 'leaky' we want the negative gradient to be and in a lot of cases we just want this to be slight, to avoid it being completely zero and so a value of 0.2 is employed here. This is something that is quite common amongst GAN papers, in particular in DCGAN(deep convolutional GAN)\cite{DBLP:journals/corr/RadfordMC15}. One of the main problems Leaky ReLUs solve is the dying ReLU problem, whereby a large gradient flowing through a ReLU node could cause the weights to update in such a way that the neuron will never activate again. It is common on large scale networks that a large proportion is 'dead'. I care about this here in the GAN, as the network is very dense in terms of the amount of epochs we train on the data and so I want to mitigate this problem. 
+I use leaky ReLU to allow gradients to flow backward through the layer unimpeded. TensorFlow does not provide an operation for leaky ReLUs, but the Keras API has a nice wrapper for adding this as a layer. The alpha parameter is essentially how 'leaky' we want the negative gradient to be and in a lot of cases we just want this to be slight, to avoid it being completely zero and so a value of 0.2 is employed here. This is something that is quite common amongst GAN papers, in particular in DCGAN(deep convolutional GAN)\cite{DBLP:journals/corr/RadfordMC15}. One of the main problems Leaky ReLUs solve is the dying ReLU problem, whereby a large gradient flowing through a ReLU node could cause the weights to update in such a way that the neuron will never activate again. It is common on large-scale networks that a large proportion is 'dead'. I care about this here in the GAN, as the network is very dense in terms of the number of epochs we train on the data and so I want to mitigate this problem. 
 
-\textbf{Batch Normalisation} layers aim to increase stability of the networks (which in GANs is something we really care about) by normalising node outputs, just like we do to data in the original preprocessing stages.
+\textbf{Batch Normalisation} layers aim to increase the stability of the networks (which in GANs is something we really care about) by normalising node outputs, just like we do to data in the original preprocessing stages.
 
 \subsubsection{The Adam Optimiser}
 The Adam optimiser is one which is often seen as the default to use in modern deep learning applications, due to empirical evidence reported in the original paper\cite{DBLP:journals/corr/KingmaB14} whereby it is stated ``Using large models and datasets, we demonstrate Adam can efficiently solve practical deep learning problems" and showing its performance over that of other optimiser functions. 
 
-To this end, I used the Adam optimiser as the primary algorithm in my models. Adam is not like classical stochastic gradient descent whereby a single, constant learning rate is maintained across all weights, but instead the method computes individual adaptive learning rates for different parameters.
+To this end, I used the Adam optimiser as the primary algorithm in my models. Adam is not like classical stochastic gradient descent whereby a single, constant learning rate is maintained across all weights, but instead, the method computes individual adaptive learning rates for different parameters.
 
 By altering the learning rate in the Adam optimiser, I was able to see better convergence in my GAN loss graphs. 
 
@@ -708,7 +708,7 @@ By altering the learning rate in the Adam optimiser, I was able to see better co
 Given that this is very experimental, I also tried variations of the models in order to see what effect they had on the loss curves and generated outputs. The idea being that these may combat the main problem of one network overpowering the other. I outline some of the variations I tried below.
 
 \begin{itemize}
-\item Standard adversarial training: with each epoch, the discriminator and generator are training independantly. 
+\item Standard adversarial training: with each epoch, the discriminator and generator are training independently. 
 \item Pre-training the discriminator for 500 epochs and then letting the generator learn for the remainder.
 \item Alternating between training the discriminator for 500 epochs and then the generator for 500 epochs.
 \item Using SMOTE on the data and using standard adversarial training.
@@ -724,7 +724,7 @@ The second GAN model was set up with the aim that the generator network would be
 
 Semi-Supervised learning\cite{odena2016semi} is an approach in which the output of the discriminator network is altered such that the network splits the real probability into N classes and thus giving us means of classifying with the model. 
 
-A difficulty that lies with trying to use the GAN as a classifier, is in the decision of what to base the generative model on. In the previous models, I was experimenting mainly on how well we can learn and generate fraudulent data and with some parameter tweaking, a stable GAN could be achieved with interesting results. However, if we want to classify between Fraud and Genuine as well as Fake and Generated, then the network needs to be trained on the genuine examples too. 
+A difficulty that lies with trying to use the GAN as a classifier, is in the decision of what to base the generative model on. In the previous models, I was experimenting mainly with how well we can learn and generate fraudulent data and with some parameter tweaking, a stable GAN could be achieved with interesting results. However, if we want to classify between Fraud and Genuine as well as Fake and Generated, then the network needs to be trained on the genuine examples too. 
 
 Some problems that can occur here are fairly logical. If we only train to generate fraud then the network might learn that all fraud-like data is simply fake. On the other hand, if we train the generator to generate a transaction in general (i.e both fraud and genuine) then the imbalance in the dataset may have a hard time to pick up fraud. 
 I experimented with a few variations to see how classification results compare. \\
@@ -743,7 +743,7 @@ Figure~\ref{fig:gan-ssl} below shows a diagram that outlines the change that the
 
 \subsubsection{Problems with GANs}
 
-\textbf{Mode Collapse}: One problem when training the GAN for a large number of epochs, is a problem called Mode Collapse. This can be visualised in the generated output when the data distributed 'collapses' and suddenly becomes a lot more refined. This is the network learning a certain range and shape of data particularly well and disregarding the rest. In attempt to mitigate this problem, one can try adjusting the number of epochs for which you let the network run, to try and best capture the data distribution. 
+\textbf{Mode Collapse}: One problem when training the GAN for a large number of epochs, is a problem called Mode Collapse. This can be visualised in the generated output when the data distributed 'collapses' and suddenly becomes a lot more refined. This is the network learning a certain range and shape of data particularly well and disregarding the rest. In an attempt to mitigate this problem, one can try adjusting the number of epochs for which you let the network run, to try and best capture the data distribution. 
 
 
 % Evaluation
@@ -765,7 +765,7 @@ Therefore we need to look at metrics that tell us more about what we're interest
 
 Precision is intuitively the ability of the classifier to not misclassify. Recall is intuitively how well to catch fraudulent examples. 
 
-Of course the threshold by which we allow benign transactions to be misclassified as fraud, is a business decision. In the context of a bank, of course the number of fraudulent transactions caught is very important but at the same time we care about precision as this amounts to freezing customers accounts, sending text messages even though they are not subject to fraud, which ultimately costs the bank time and money and potentially customers.
+Of course, the threshold by which we allow benign transactions to be misclassified as fraud, is a business decision. In the context of a bank, the number of fraudulent transactions caught is very important but at the same time, we care about precision as this amounts to freezing customers accounts, sending text messages even though they are not subject to fraud, which ultimately costs the bank time and money and potentially customers, too.
 
 \subsubsection{F1-Score}
 
@@ -775,7 +775,7 @@ This is a weighted harmonic mean and allows us to use the parameters to pay more
 Thus giving:
 $$F _ { 1} = \frac { 2P R } { P + R }$$
 
-The reason why we us this harmonic approach, rather than a standard average is so that extreme cases are penalised more. Of course, reported values of F1-Scores are actually just snapshots of single precision and single recall scores, AUC captures a summary of these as described below. 
+The reason why we use this harmonic approach, rather than a standard average is so that extreme cases are penalised more. Of course, reported values of F1-Scores are actually just snapshots of single precision and single recall scores, AUC captures a summary of these as described below. 
 
 \subsubsection{Confusion Matrix}
 
@@ -807,9 +807,9 @@ When classifying, the true positive rate (TPR) and false positive rate (FPR) cha
 Taking the area under this curve is known as AUC, therefore gives an overall statistic for comparing classifiers. In the results that follow, I simply use a 0.5 probability threshold for classification. The ROC-AUC scores are useful in shedding light on the effectiveness of the deep learning models as this metric will summarise the varying thresholds.
 
 \textbf{GAN loss function graphs and generated data visualising}\\
-With GANs, the way in which we can visualise performance is different to others due to it's specific adversarial nature. Two prominent use cases for GANs is to view the loss function graph for the generator and discriminator networks to see how the two networks fight with each other. In an ideal, theoretical world, we would expect to see the two loss curves converging to some stable value, which indicates the two networks can no longer improve or better themselves. 
+With GANs, the way in which we can visualise performance is different to others due to its specific adversarial nature. Two prominent use cases for GANs is to view the loss function graph for the generator and discriminator networks to see how the two networks fight with each other. In an ideal, theoretical world, we would expect to see the two loss curves converging to some stable value, which indicates the two networks can no longer improve or better themselves. 
 
-Also, seeing as a large part of the GAN architecture is generating data, we can inspect this to see if it looks appropriate. A common example with the MNIST dataset is to see if the generated images look like handwritten digits. In this case, we can inspect the shape and distribution of the generated fraud transactions and view them side-by-side with real fraud transactions to see if any similarities have been picked up by the network. To do this, I selected two of the most prominent features from the data in which fraud is very clearly disparate from that of the genuine examples. This can easily be observed by plotting the features on histogram plots to see the variations. I did so and I chose to inspect a plot of V17-V10 (features 17 and 10).
+Also, seeing as a large part of the GAN architecture is generating data, we can inspect this to see if it looks appropriate. A common example with the MNIST dataset is to see if the generated images look like handwritten digits. In this case, we can inspect the shape and distribution of the generated fraud transactions and view them side-by-side with real fraud transactions to see if any similarities have been picked up by the network. To do this, I selected two of the most prominent features of the data in which fraud is very clearly disparate from that of the genuine examples. This can easily be observed by plotting the features on histogram plots to see the variations. I did so and I chose to inspect a plot of V17-V10 (features 17 and 10).
 
 \section{Results Overview}
 \subsection{Baseline Models}
@@ -887,7 +887,7 @@ Table~\ref{table:baseline-results} below demonstrates the results for the baseli
 
 \item \textbf{Under-Sampled dataset results}: When the data has been under-sampled, that is, a very large proportion of data has been taken away to balance the classes, we see that precision is dramatically affected. Hence, so are the F1 scores. This observation is perhaps somewhat intuitive given that if we think that we are removing information from the system, the model has less to learn on and hence more misclassifications of the genuine class will occur. 
 
-\item \textbf{Over-Sampled dataset results}: Comparing this set of results with the original dataset, an observation can be made that on the whole, recall scores increase however precision scores suffer. Considering that this form of resampling is duplicating fraud data points, it is understandable why recall would increase. Here it is also observed that tree based classifiers remain high performers. 
+\item \textbf{Over-Sampled dataset results}: Comparing this set of results with the original dataset, an observation can be made that on the whole, recall scores increase however precision scores suffer. Considering that this form of resampling is duplicating fraud data points, it is understandable why recall would increase. Here it is also observed that tree-based classifiers remain high performers. 
 
 \item \textbf{SMOTE dataset results}: Similarly the tree based classifiers perform better than the others. Some of the classifiers performed worse with SMOTE, which is perhaps due to how the model has learned differently from duplicated data vs different synthetic data. However, it is interesting to note that Random Forest and MLP remain consistent, which is a good sign as theoretically we would prefer to use SMOTE given that the data points are different. 
  
@@ -997,7 +997,7 @@ Having a recall of $ \approx0.53 $ is not particularly great for the problem at 
 These results indicate that perhaps a smaller batch size but higher window height performs the best. One trend to note, however, are the very high auc scores. This suggests that the models could achieve better f1 scores if allowing the classification to be done on a threshold different to 0.5. This is promising and means there is potential to find a better tradeoff of precision and recall, which better suits the business need.
 
 \subsection{GAN Models}
-In this section I report findings from the GAN approaches in application to the credit card fraud data. These results were all carried out on the original dataset . It is clear that this is a very experimental use-case with the low reported precision scores seen below, but the effects of network variations are still interesting nonetheless.
+In this section, I report findings from the GAN approaches in application to the credit card fraud data. These results were all carried out on the original dataset. It is clear that this is a very experimental use-case with the low reported precision scores seen below, but the effects of network variations are still interesting nonetheless.
 
 \subsubsection{GAN version 1 and its variations}
 
@@ -1007,7 +1007,7 @@ In these versions, only the fraud data is being used, as the aim is to see how t
 
 In this version, standard adversarial training is applied. Both the generator and discriminator are trained separately in each epoch.
 
-Figure~\ref{fig:ganv1-losses} below shows the training losses for the model. It can be observed that between 500 and 1500 epochs, the generator improves and learns to fool the discriminator, but after this point the generator's loss slowly diverges as clearly the discriminator overpowers it, after eventually learning the data.
+Figure~\ref{fig:ganv1-losses} below shows the training losses for the model. It can be observed that between 500 and 1500 epochs, the generator improves and learns to fool the discriminator, but after this point, the generator's loss slowly diverges as clearly, the discriminator overpowers it after eventually learning the data.
 
 \begin{figure}[!htbp]
 \centering
@@ -1016,7 +1016,7 @@ Figure~\ref{fig:ganv1-losses} below shows the training losses for the model. It 
 \label{fig:ganv1-losses}
 \end{figure}
 
-As an example of what generated output looks like and what was used to visualise fraud generation, Figure~\ref{fig:ganv1-generatedoutput} below shows the plot that was generated over 6 regular save intervals during training. In this particular case you can see the actual fraud data on the left and the generated fraud on the right, for every 1000 epochs. It can be observed that the model is slowly learning the shape and distribution of the data, albeit not perfectly. 
+As an example of what generated output looks like and what was used to visualise fraud generation, Figure~\ref{fig:ganv1-generatedoutput} below shows the plot that was generated over 6 regular save intervals during training. In this particular case, you can see the actual fraud data on the left and the generated fraud on the right, for every 1000 epochs. It can be observed that the model is slowly learning the shape and distribution of the data, albeit not perfectly. 
 
 For the sake of brevity, I will omit future generated output plots for the following versions, but they can be seen in the Appendix. 
 
@@ -1038,7 +1038,7 @@ In version 1.2, I adapt the adversarial training to a setup whereby the discrimi
 \label{fig:ganv1.2-losses}
 \end{figure}
 
-The resulting graph for this variation is intuitive. After the discriminator is stopped training, the generator simply continues to learn to fool the now static discriminator. You can observe in the graph that the orange loss curve tends to zero very quickly afterwards. Figure~\ref{fig:GANv1.2-v17-v10-img_2} in the appendix shows that the generator concentrates a small subset that are able to fool the discriminator. 
+The resulting graph for this variation is intuitive. After the discriminator is stopped training, the generator simply continues to learn to fool the now static discriminator. You can observe in the graph that the orange loss curve tends to zero very quickly afterward. Figure~\ref{fig:GANv1.2-v17-v10-img_2} in the appendix shows that the generator concentrates a small subset that is able to fool the discriminator. 
 
 \textbf{Version 1.3}
 
@@ -1064,10 +1064,10 @@ In version 1.4, I used SMOTE data with standard adversarial training. Figure~{fi
 
 \subsubsection{GAN version 2}
 
-On the whole, the results for the second GAN model (using a previous CNN as a generator) showed relatively similar performance to the prior model, exhibiting similar loss and output graphs. It seems to be a common case with this data, that eventually the discriminator simply overpowers the generator in a slow diverging manner. Despite loading weights from the CNN model, the network continues quickly to expose any data distribution that it learns very quickly and after this point the loss just deteriorates as with previous models.
+On the whole, the results for the second GAN model (using a previous CNN as a generator) showed relatively similar performance to the prior model, exhibiting similar loss and output graphs. It seems to be a common case with this data, that eventually the discriminator simply overpowers the generator in a slow diverging manner. Despite loading weights from the CNN model, the network continues quickly to expose any data distribution that it learns very quickly and after this point, the loss just deteriorates as with previous models.
 
 \subsubsection{Semi Supervised Results}
-In this section I report findings from the semi-supervised approach to the GAN in application to the credit card fraud data. I report two main sets of results, one for a smaller amount of epochs and one for a larger amount, to give an indication of the differences in results and also because during experimentation these were key points.
+In this section, I report findings from the semi-supervised approach to the GAN in application to the credit card fraud data. I report two main sets of results, one for a smaller amount of epochs and one for a larger amount, to give an indication of the differences in results and also because during experimentation these were key points.
 Table~\ref{table:ganv1-ssl-original} below shows the reported scores for 600 epochs and 6000 epochs respectively. 
 
 \textbf{Variation 1 - Using the original dataset in training (i.e the generator attempts to generate both fraud and non-fraud).}
@@ -1086,7 +1086,7 @@ Table~\ref{table:ganv1-ssl-original} below shows the reported scores for 600 epo
 \label{table:ganv1-ssl-original}
 \end{table}
 
-It is clear from these results that the precision is very poor, despite rather good recall scores. An interesting trend to note from these is that increasing the amount of epochs that the network trains, decreases the recall but improves the precision. Although this improvement seems insignificant, this is just due to the amount of genuine examples compared with that of the true positives (the fraud). Figure~\ref{fig:ganv1-ssl-cm-600} shows the confusion matrix for the 600 epochs run and it is observed that 57507 genuine transactions were misclassified as fraud. That is 81\% of all genuine transactions. In contrast, Figure~\ref{fig:ganv1-ssl-cm-6000} shows the confusion matrix for the 6000 epochs run and the false negative count has decreased to 22\%. In raw numbers, that is over 40,000 transactions that have been now correctly classified. So clearly, the increased epochs performs better and allows the network to learn better which transactions are genuine. 
+It is clear from these results that the precision is very poor, despite rather good recall scores. An interesting trend to note from these is that increasing the number of epochs that the network trains, decreases the recall but improves the precision. Although this improvement seems insignificant, this is just due to the number of genuine examples compared with that of the true positives (the fraud). Figure~\ref{fig:ganv1-ssl-cm-600} shows the confusion matrix for the 600 epochs run and it is observed that 57507 genuine transactions were misclassified as fraud. That is 81\% of all genuine transactions. In contrast, Figure~\ref{fig:ganv1-ssl-cm-6000} shows the confusion matrix for the 6000 epochs run and the false negative count has decreased to 22\%. In raw numbers, that is over 40,000 transactions that have been now correctly classified. So clearly, the increased epochs perform better and allow the network to learn better which transactions are genuine. 
 
 \begin{figure}[H]
 \centering
@@ -1118,7 +1118,7 @@ Based on this observation it was fitting to try running with a number of epochs 
 \label{table:ganv1-ssl-original-2}
 \end{table}
 
-\textbf{Variation 2 - Similar to version 1, but ensuring the discriminator takes a 50:50 ratio of fraud and genuine transacations, from the real portion of the input.}
+\textbf{Variation 2 - Similar to version 1, but ensuring the discriminator takes a 50:50 ratio of fraud and genuine transactions, from the real portion of the input.}
 
 Here, when the discriminator takes a half batch of real and generated input, I ensure that the real input has an equal amount of fraud and genuine data. The results for this are as follows:
 
@@ -1146,11 +1146,11 @@ In this case, the network was not useful at all. Due to the fact that the networ
 % Conclusion
 \chapter{Conclusions}
 
-The aims of the project are to experiment whether the types of deep learning models described, are feasible and useful, in application to credit card fraud detection. I successfully show that these models can be applied, in their variations, to this problem space. The question of how useful they are, then comes down to certain trade-offs, described henceforth.
+The aims of the project are to experiment whether the types of deep learning models described are feasible and useful, in application to credit card fraud detection. I successfully show that these models can be applied, in their variations, to this problem space. The question of how useful they are then comes down to certain trade-offs, described henceforth.
 
 The results of the CNN models are promising, especially those of CNN Model 2, with the sliding window variations. The ROC-AUC score for this model was very high at ~0.95, which suggests that for classification thresholds other than 0.5, this model could potentially report higher precision/recall scores. This suggests that using convolutional based networks definitely has a place in the time-series and credit card fraud domain. This stems from the experimentation in this project but also from previously seen success, as mentioned with WaveNet and other papers that have recently started to use convolutional techniques on time-series data. With deep learning architectures like this, there are many variables and methods that can be undertaken to further tune and improve the performance of the models. In this project, I scratched the surface of these but with further experimentation, I suspect we could achieve even more comparable results. 
 
-In the GAN experiments, I show from visual inspection of the loss graph and generated outputs, that it is possible to train a model to learn what fraudulent transactions look like. A tradeoff is that the GAN falls victim of mode-collapse, learning only a specific subset particularly well. Also, the discriminator overpowers the generator after increased training epochs. The semi-supervised extension provides indication that there is the possibility of effective performance when using the network as a classification model. A result of interest is a ROC-AUC score of 0.90 at 30000 epochs, for the second variation. This seemed to be a sweet-spot in the training process and hence is suggestive that with more manual labour of finding the right conditions, a comparatively useful classifier could be achieved. However, other than this specific result, the overall performance was sub-standard in comparison to the previous models in the project. This may be an indication that GANs would be limited when actually applying this to the real-world problem of credit card fraud detection. There is a fixed amount of information in a dataset and a theoretically optimal classifier would use all of that information. The GAN trained on the dataset does not actually create new information, it just tries to learn best the distribution of the original data. This is advantageous in that the model handles noise in the data well and homes in on a certain distribution of data. To this end, GANs may indeed be useful for data-augmentation purposes. 
+In the GAN experiments, I show from visual inspection of the loss graph and generated outputs, that it is possible to train a model to learn what fraudulent transactions look like. A tradeoff is that the GAN falls victim of mode-collapse, learning only a specific subset particularly well. Also, the discriminator overpowers the generator after increased training epochs. The semi-supervised extension provides an  indication that there is the possibility of effective performance when using the network as a classification model. A result of interest is a ROC-AUC score of 0.90 at 30000 epochs, for the second variation. This seemed to be a sweet-spot in the training process and hence is suggestive that with more manual labour of finding the right conditions, a comparatively useful classifier could be achieved. However, other than this specific result, the overall performance was sub-standard in comparison to the previous models in the project. This may be an indication that GANs would be limited when actually applying this to the real-world problem of credit card fraud detection. There is a fixed amount of information in a dataset and a theoretically optimal classifier would use all of that information. The GAN trained on the dataset does not actually create new information, it just tries to learn best the distribution of the original data. This is advantageous in that the model handles noise in the data well and homes in on a certain distribution of data. To this end, GANs may indeed be useful for data-augmentation purposes. 
 
 For fraud detection in general, we have to also consider the GAN in comparison to what we can already achieve with other models used in the project. Based on reported results and experimentation it would appear that a lot more manual effort is required in order to fine-tune the GAN to perform well as a classifier. Further to this, a lot more data would be needed in order to achieve more effective results and we would need to train for a very long time to uncover proportionally smaller incremental improvements. Therefore, it is suggestive that it is perhaps better to expend manual effort tuning parameters and optimising something like the Random Forest Classifier. 
 
