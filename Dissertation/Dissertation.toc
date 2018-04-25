@@ -1,71 +1,71 @@
 \contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.1}
-\contentsline {chapter}{\numberline {2}Preparation}{7}{chapter.2}
-\contentsline {section}{\numberline {2.1}Software Engineering}{7}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Requirements}{7}{subsection.2.1.1}
-\contentsline {subsection}{\numberline {2.1.2}Tools and Technologies Used}{8}{subsection.2.1.2}
-\contentsline {subsubsection}{Machine Learning}{8}{section*.7}
-\contentsline {subsubsection}{Version Control and Project Tools}{8}{section*.8}
-\contentsline {subsubsection}{Languages}{8}{section*.9}
-\contentsline {subsection}{\numberline {2.1.3}Starting Point}{8}{subsection.2.1.3}
-\contentsline {section}{\numberline {2.2}Convolutional Neural Networks}{9}{section.2.2}
-\contentsline {section}{\numberline {2.3}Generative Adversarial Networks}{10}{section.2.3}
-\contentsline {section}{\numberline {2.4}Machine Learning Evaluation Practices}{12}{section.2.4}
-\contentsline {subsection}{\numberline {2.4.1}Train and Test Splits}{12}{subsection.2.4.1}
-\contentsline {subsection}{\numberline {2.4.2}Cross-validation}{13}{subsection.2.4.2}
-\contentsline {subsection}{\numberline {2.4.3}Resampling Methods}{13}{subsection.2.4.3}
-\contentsline {subsubsection}{Undersampling}{14}{section*.14}
-\contentsline {subsubsection}{Oversampling}{14}{section*.15}
-\contentsline {paragraph}{Duplicate Oversampling}{14}{section*.16}
-\contentsline {paragraph}{SMOTE}{14}{section*.17}
-\contentsline {subsubsection}{Cross-validating Correctly}{14}{section*.18}
-\contentsline {chapter}{\numberline {3}Implementation}{17}{chapter.3}
-\contentsline {section}{\numberline {3.1}Models Overview}{17}{section.3.1}
-\contentsline {section}{\numberline {3.2}Baseline Models}{18}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}Data Preparation}{18}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}Cross Validation Function}{19}{subsection.3.2.2}
-\contentsline {subsection}{\numberline {3.2.3}Cross Validation the Wrong Way}{19}{subsection.3.2.3}
-\contentsline {subsection}{\numberline {3.2.4}Resampling functions}{21}{subsection.3.2.4}
-\contentsline {subsection}{\numberline {3.2.5}Collecting Results for All Classifiers}{21}{subsection.3.2.5}
-\contentsline {section}{\numberline {3.3}Convolutional Neural Network Models}{21}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Overview}{21}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}CNN Version 1}{22}{subsection.3.3.2}
-\contentsline {subsubsection}{Version 1-1}{22}{section*.22}
-\contentsline {subsubsection}{Version 1-2}{22}{section*.24}
-\contentsline {subsubsection}{ReLU Activations}{24}{section*.25}
-\contentsline {subsection}{\numberline {3.3.3}CNN Version 2}{24}{subsection.3.3.3}
-\contentsline {subsubsection}{Overview}{24}{section*.26}
-\contentsline {subsubsection}{Causal Padding}{25}{section*.29}
-\contentsline {subsubsection}{Preprocessing}{26}{section*.30}
-\contentsline {subsubsection}{Time-Series Cross-Validation}{27}{section*.31}
-\contentsline {section}{\numberline {3.4}Generative Adversarial Network Models}{27}{section.3.4}
-\contentsline {subsection}{\numberline {3.4.1}Overview}{27}{subsection.3.4.1}
-\contentsline {subsection}{\numberline {3.4.2}Adversarial Training}{29}{subsection.3.4.2}
-\contentsline {subsection}{\numberline {3.4.3}GAN Version 1 - Dense Generator}{30}{subsection.3.4.3}
-\contentsline {subsubsection}{Leaky ReLUs}{31}{section*.32}
-\contentsline {subsubsection}{The Adam Optimiser}{31}{section*.33}
-\contentsline {subsubsection}{Training Variations}{31}{section*.34}
-\contentsline {subsection}{\numberline {3.4.4}GAN Version 2 - Previous CNN Generator}{32}{subsection.3.4.4}
-\contentsline {subsection}{\numberline {3.4.5}Semi-Supervised Learning for Classification}{32}{subsection.3.4.5}
-\contentsline {subsubsection}{Problems with GANs}{33}{section*.36}
-\contentsline {chapter}{\numberline {4}Evaluation}{34}{chapter.4}
-\contentsline {section}{\numberline {4.1}Evaluation Methodology}{34}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Metrics}{34}{subsection.4.1.1}
-\contentsline {subsubsection}{Precision and Recall}{34}{section*.37}
-\contentsline {subsubsection}{F1-Score}{35}{section*.38}
-\contentsline {subsubsection}{Confusion Matrix}{35}{section*.39}
-\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{36}{subsection.4.1.2}
-\contentsline {section}{\numberline {4.2}Results Overview}{36}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}Baseline Models}{36}{subsection.4.2.1}
-\contentsline {subsubsection}{Results Table}{36}{section*.41}
-\contentsline {subsubsection}{Further Tuning the RandomForest }{39}{section*.44}
-\contentsline {subsection}{\numberline {4.2.2}CNN Models}{40}{subsection.4.2.2}
-\contentsline {subsubsection}{CNN Version 1 Results}{40}{section*.46}
-\contentsline {subsubsection}{CNN Version 2 Results}{40}{section*.49}
-\contentsline {subsection}{\numberline {4.2.3}GAN Models}{41}{subsection.4.2.3}
-\contentsline {subsubsection}{GAN version 1 and it's variations}{41}{section*.52}
-\contentsline {subsubsection}{GAN version 2}{44}{section*.58}
-\contentsline {subsubsection}{Semi Supervised Results}{44}{section*.59}
-\contentsline {chapter}{\numberline {5}Conclusions}{47}{chapter.5}
-\contentsline {chapter}{Bibliography}{48}{chapter.5}
-\contentsline {chapter}{\numberline {A}GAN Generated Outputs}{49}{appendix.A}
-\contentsline {chapter}{\numberline {B}Project Proposal}{53}{appendix.B}
+\contentsline {chapter}{\numberline {2}Preparation}{8}{chapter.2}
+\contentsline {section}{\numberline {2.1}Software Engineering}{8}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Requirements}{8}{subsection.2.1.1}
+\contentsline {subsection}{\numberline {2.1.2}Tools and Technologies Used}{9}{subsection.2.1.2}
+\contentsline {subsubsection}{Machine Learning}{9}{section*.7}
+\contentsline {subsubsection}{Version Control and Project Tools}{9}{section*.8}
+\contentsline {subsubsection}{Languages}{9}{section*.9}
+\contentsline {subsection}{\numberline {2.1.3}Starting Point}{9}{subsection.2.1.3}
+\contentsline {section}{\numberline {2.2}Convolutional Neural Networks}{10}{section.2.2}
+\contentsline {section}{\numberline {2.3}Generative Adversarial Networks}{11}{section.2.3}
+\contentsline {section}{\numberline {2.4}Machine Learning Evaluation Practices}{13}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Train and Test Splits}{13}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}Cross-validation}{14}{subsection.2.4.2}
+\contentsline {subsection}{\numberline {2.4.3}Resampling Methods}{14}{subsection.2.4.3}
+\contentsline {subsubsection}{Undersampling}{15}{section*.14}
+\contentsline {subsubsection}{Oversampling}{15}{section*.15}
+\contentsline {paragraph}{Duplicate Oversampling}{15}{section*.16}
+\contentsline {paragraph}{SMOTE}{15}{section*.17}
+\contentsline {subsubsection}{Cross-validating Correctly}{15}{section*.18}
+\contentsline {chapter}{\numberline {3}Implementation}{18}{chapter.3}
+\contentsline {section}{\numberline {3.1}Models Overview}{18}{section.3.1}
+\contentsline {section}{\numberline {3.2}Baseline Models}{19}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Data Preparation}{19}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Cross Validation Function}{20}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Cross Validation the Wrong Way}{20}{subsection.3.2.3}
+\contentsline {subsection}{\numberline {3.2.4}Resampling functions}{22}{subsection.3.2.4}
+\contentsline {subsection}{\numberline {3.2.5}Collecting Results for All Classifiers}{22}{subsection.3.2.5}
+\contentsline {section}{\numberline {3.3}Convolutional Neural Network Models}{22}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Overview}{22}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}CNN Version 1}{23}{subsection.3.3.2}
+\contentsline {subsubsection}{Version 1-1}{23}{section*.22}
+\contentsline {subsubsection}{Version 1-2}{23}{section*.24}
+\contentsline {subsubsection}{ReLU Activations}{25}{section*.25}
+\contentsline {subsection}{\numberline {3.3.3}CNN Version 2}{25}{subsection.3.3.3}
+\contentsline {subsubsection}{Overview}{25}{section*.26}
+\contentsline {subsubsection}{Causal Padding}{26}{section*.29}
+\contentsline {subsubsection}{Preprocessing}{27}{section*.30}
+\contentsline {subsubsection}{Time-Series Cross-Validation}{28}{section*.31}
+\contentsline {section}{\numberline {3.4}Generative Adversarial Network Models}{28}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Overview}{28}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Adversarial Training}{30}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.4.3}GAN Version 1 - Dense Generator}{31}{subsection.3.4.3}
+\contentsline {subsubsection}{Leaky ReLUs}{32}{section*.32}
+\contentsline {subsubsection}{The Adam Optimiser}{32}{section*.33}
+\contentsline {subsubsection}{Training Variations}{32}{section*.34}
+\contentsline {subsection}{\numberline {3.4.4}GAN Version 2 - Previous CNN Generator}{33}{subsection.3.4.4}
+\contentsline {subsection}{\numberline {3.4.5}Semi-Supervised Learning for Classification}{33}{subsection.3.4.5}
+\contentsline {subsubsection}{Problems with GANs}{34}{section*.36}
+\contentsline {chapter}{\numberline {4}Evaluation}{35}{chapter.4}
+\contentsline {section}{\numberline {4.1}Evaluation Methodology}{35}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Metrics}{35}{subsection.4.1.1}
+\contentsline {subsubsection}{Precision and Recall}{35}{section*.37}
+\contentsline {subsubsection}{F1-Score}{36}{section*.38}
+\contentsline {subsubsection}{Confusion Matrix}{36}{section*.39}
+\contentsline {subsection}{\numberline {4.1.2}Visual Inspections}{37}{subsection.4.1.2}
+\contentsline {section}{\numberline {4.2}Results Overview}{37}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}Baseline Models}{37}{subsection.4.2.1}
+\contentsline {subsubsection}{Results Table}{37}{section*.41}
+\contentsline {subsubsection}{Further Tuning the RandomForest }{40}{section*.44}
+\contentsline {subsection}{\numberline {4.2.2}CNN Models}{41}{subsection.4.2.2}
+\contentsline {subsubsection}{CNN Version 1 Results}{41}{section*.46}
+\contentsline {subsubsection}{CNN Version 2 Results}{41}{section*.49}
+\contentsline {subsection}{\numberline {4.2.3}GAN Models}{42}{subsection.4.2.3}
+\contentsline {subsubsection}{GAN version 1 and its variations}{42}{section*.52}
+\contentsline {subsubsection}{GAN version 2}{46}{section*.58}
+\contentsline {subsubsection}{Semi Supervised Results}{46}{section*.59}
+\contentsline {chapter}{\numberline {5}Conclusions}{49}{chapter.5}
+\contentsline {chapter}{Bibliography}{51}{chapter.5}
+\contentsline {chapter}{\numberline {A}GAN Generated Outputs}{52}{appendix.A}
+\contentsline {chapter}{\numberline {B}Project Proposal}{56}{appendix.B}
