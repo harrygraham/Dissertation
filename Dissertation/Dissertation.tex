@@ -164,7 +164,7 @@ The main success criteria of the project is outlined as follows:
    \item Baseline Models
    \begin{itemize}
      \item Compare a handful of supervised learning classifiers, from SciKit-Learn.
-     \item Using metrics described in the Evaluation section of the project.
+     \item Use metrics described in Chapter 4, to evaluate the models' performance.
      \item Experiment with resampling techniques. 
      \item Implement appropriate cross-validation.
    \end{itemize}
@@ -191,7 +191,7 @@ Below I describe and justify where necessary the tools and technologies that I u
 
 I implemented work predominately making use of Keras\footnote{\href{https://keras.io}{https://keras.io}}(with TensorFlow\footnote{\href{https://www.tensorflow.org}{https://www.tensorflow.org}} backend) for CNN and GAN work. I made use of SciKit-Learn\footnote{\href{ http://scikit-learn.org/stable/}{ http://scikit-learn.org/stable/}} for baseline models and some general data manipulation/metric functions. 
 
-The reasons for these choices were a mixture of good documentation, popularity \& ease-of-use. Using a TensorFlow backend meant that I could use GPU acceleration if needed. I used Keras as a TensorFlow wrapper, so I could avoid writing models completely from scratch but still giving me the flexibility to develop around models and customise to a large extent. Similarly with SciKit-Learn, which has a lot of helpful utility functions for evaluating models and processing data.
+The reasons for these choices were a mixture of good documentation, popularity \& ease-of-use. Using a TensorFlow backend meant that I could use GPU acceleration if needed. I used Keras as a TensorFlow wrapper, so I could avoid writing models completely from scratch but still giving me the flexibility to develop around models and customise to a large extent. Similarly I used SciKit-Learn for baseline models and some utility functions, which are helpful for evaluating models and processing data.
 
 \subsubsection{Version Control and Project Tools}
 
@@ -266,7 +266,7 @@ The process of training for a GAN is like a min-max game between the two network
 $$\min _ { G } \max _ { D } V ( D ,G )$$
 where 
 $$V ( D ,G ) = \mathbb { E } _ { x \sim p _ { d a t a } ( x ) } [ \log D ( x ) ] + \mathbb { E } _ { z \sim p _ { z } ( z ) }[ \log ( 1- D ( G ( z ) ) ] $$
-The first term in this equation represents the quantity of the real-distributed data passed through the discriminator network. The discriminator tries to maximise this such that $D(x)\rightarrow 1$. The second term represents generated data passed through the discriminator. The generator tries to minimise such that $D(G(z))\rightarrow 1$ (i.e the discriminator is fooled by the generated sample).
+The first term in this equation represents the quantity of the real-distributed data passed through the discriminator network. The discriminator tries to maximise this such that $D(x)\rightarrow 1$. The second term represents generated data passed through the discriminator. The generator tries to minimise such that $D(G(z))\rightarrow 1$ (i.e., the discriminator is fooled by the generated sample).
 
 The steps for training a GAN can be outlined as followed:
 \begin{enumerate}[Step 1:]
@@ -281,7 +281,7 @@ The steps for training a GAN can be outlined as followed:
   \item Repeat the above for n epochs until neither network makes any further improvements
 \end{enumerate}
 
-In summary, we alternate between the training of the discriminator; to correctly determine real or fake data, and training the generator; on fooling the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
+In summary, we alternate between the training of the discriminator and the training of the generator. The discriminator aims to correctly determine real or fake data, and the generator aims to fool the discriminator. The reason for freezing the weights of the discriminator while we train the generator is exactly so that we don't alter the weights during this process and the generator can use the current state of the discriminator to become better.
 
 \section{Machine Learning Evaluation Practices}
 Here I describe some of the main machine learning evaluation concepts that underpin the implementation of this project. 
@@ -293,18 +293,19 @@ When training a machine learning model, it will often report some metrics or los
 Let's say we have \textbf{\textit{m}} examples $ \mathbf { x } _ { 1} ,\mathbf { x } _ { 2} ,\dots ,\mathbf { x } _ { m }$ each in $\mathbb { R } ^ { n }$. In a supervised learning problem, we also have \textbf{\textit{m}} labels $\left\{ y _ { 1} ,y _ { 2} ,\dots ,y _ { m } \right\}$ in a set \textbf{\textit{Y}}.\\
 In machine learning we wish to find a hypothesis $h : \mathbb { R } ^ { n } \rightarrow Y$ that is defined by a vector of weights \textbf{\textit{w}}. It is then common to write $h _ { w } ( x )$.\\
 
-We define a training set as $\mathbf{s} = [(\mathbf { x } _ { 1}, \mathbf { y } _ { 1}),(\mathbf { x } _ { 2}, \mathbf { y } _ { 2}),\dots,(\mathbf { x } _ { m}, \mathbf { y } _ { m})]$. This dataset should then be split, to preserve a testing set.
+We define a training set as $\mathbf{s} = [(\mathbf { x } _ { 1}, \mathbf { y } _ { 1}),(\mathbf { x } _ { 2}, \mathbf { y } _ { 2}),\dots,(\mathbf { x } _ { m}, \mathbf { y } _ { m})]$. This dataset should then be split, to preserve a testing set. Figure~\ref{fig:70-30-split} depicts a common choice of a 70:30 split of the data.
  
 \begin{figure}[H]
 
 \centering
 \includegraphics[scale=0.8]{train-test-split}
 \caption{A 70:30 train test split of data.}
+\label{fig:70-30-split}
 \end{figure}
 
 \subsection{Cross-validation}
 
-Cross-validation takes train-test splits a step further. The hypothesis of our model may in fact generalise and perform better on some portions of the data over others and thus performing just one split, may not give the most confident results. Also, when performing these train-test splits, the element of randomness in the split can work against us as even if we average this process say 3 times, it is likely that there is some overlap in the runs and we are not really using the data available to its full capacity. Figure~\ref{fig:k-fold-cross-val} represents a type of cross-validation called K-Fold. This is where the data is split into K sections and with every iteration, the model trains on $K-1$ folds and tests on the remaining fold. This ensures that all the data is beings used to its full extent and that we test on every portion of the data to get the best estimation for the generalisability of the model.
+Cross-validation takes train-test splits a step further. The hypothesis of our model may in fact generalise and perform better on some portions of the data over others and thus performing just one split, may not give the most confident results. Also, when performing these train-test splits, the element of randomness in the split can work against us as even if we average this process say 3 times, it is likely that there is some overlap in the runs and we are not really using the data available to its full capacity. Figure~\ref{fig:k-fold-cross-val} represents a type of cross-validation called K-Fold. This is where the data is split into K sections and with every iteration, the model trains on $K-1$ folds and tests on the remaining fold. This ensures that all the data is being used to its full extent and that we test on every portion of the data to get the best estimation for the generalisability of the model.
 
 \begin{figure}[H]
 
@@ -316,7 +317,7 @@ Cross-validation takes train-test splits a step further. The hypothesis of our m
 
 \subsection{Resampling Methods}
 
-When using an unbalanced dataset, like credit card transactions, models will naturally learn to discriminate the majority class better. Therefore, in the baseline models work, I also experiment with resampling methods.
+When using an unbalanced dataset, like credit card transactions, models will naturally learn to discriminate the majority class better\cite{Japkowicz00theclass}. Therefore, in the baseline models work, I also experiment with resampling methods.
 These are ways of balancing the dataset such that the ratio of positive class to negative class is brought to 50:50. I do this to give an example of how these methods affect our results before moving onto the deep learning architectures. 
 
 The three main methods I explore are:
@@ -335,10 +336,10 @@ Oversampling is the process of increasing the minority class by adding data-poin
 I explore two types of oversampling and address the problems that can occur.
 
 \paragraph{Duplicate Oversampling} 
-Duplicate Oversampling is a naive method of increasing the amount of the minority data class, to match that of the majority. This works by taking existing minority data points and simply duplicating them. The resulting dataset therefore includes a lot of duplicated data, of the minority class.
+Duplicate Oversampling is a naive method of increasing the amount of the minority data class, to match that of the majority (i.e. a 50:50 ratio). This works by taking existing minority data points and simply duplicating them. The resulting dataset therefore includes a lot of duplicated data, of the minority class. 
 
 \paragraph{SMOTE} 
-Synthetic Minority Oversampling Technique (SMOTE) is another method of increasing the amount of the minority data but not by duplication as before. SMOTE takes the $k$ nearest neighbours of a data point, randomly selects one of these k neighbours and creates a vector between the two. Then a new, synthetic data point is created some random distance along this vector line, by an amount in the range $[0,1]$.
+Synthetic Minority Oversampling Technique (SMOTE)\cite{DBLP:journals/corr/abs-1106-1813} is another method of increasing the amount of the minority data but not by duplication as before. SMOTE takes the $k$ nearest neighbours of a data point, randomly selects one of these k neighbours and creates a vector between the two. Then a new, synthetic data point is created some random distance along this vector line, by an amount in the range $[0,1]$.
 
 \subsubsection{Cross-validating Correctly}
 Oversampling techniques affect the validity of the cross-validation process. It no longer is valid to simply oversample the dataset and then perform cross-validation because of the potential of overfitting (depicted by Figure~\ref{fig:oversample-before}).
@@ -352,7 +353,7 @@ Oversampling techniques affect the validity of the cross-validation process. It 
 
 Looking at Figure~\ref{fig:oversample-before}, the dataset is oversampled and passed to cross-validation (left-to-right). Notice that inside the cross-validation loop, the current train-test split means that some of the oversampled minority class (node 3) is in both the training and testing portions. This means that our model would have seen this data during the training process and will therefore have a bias during the testing and evaluation phase as it already knows how to classify this data. 
 
-It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Figure~\ref{fig:oversample-after-1} and Figure~\ref{fig:oversample-after-2} represent the correct way to handle this, for $n=1$ and $n=2$ respectively. For every iteration of the loop, we \textbf{first} split the data into train-test first and then oversample the training data fold only. This preserves the testing fold while keeping a portion of the original dataset untouched for evaluation. Using this methodology is crucial and a lot more effective in testing the generalisability of a model.
+It is therefore crucial that this is adapted such that any oversampling occurs inside the cross-validation loop, and not before/outside it. Figure~\ref{fig:oversample-after-1} and Figure~\ref{fig:oversample-after-2} represent the correct way to handle this, for $n=1$ and $n=2$ respectively. For every iteration of the loop, we \textbf{first} split the data into train-test and then oversample the training data fold only. This preserves the testing fold while keeping a portion of the original dataset untouched for evaluation. Using this methodology is crucial and a lot more effective in testing the generalisability of a model.
 
 \begin{figure}[H]
 \centering
@@ -372,7 +373,7 @@ It is therefore crucial that this is adapted such that any oversampling occurs i
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.8]{models_overview_2}
+\includegraphics[scale=0.8]{models_overview_3}
 \caption{Overview of models experimented with.}
 \label{fig:models_overview}
 \end{figure}
@@ -382,7 +383,7 @@ It is therefore crucial that this is adapted such that any oversampling occurs i
 
 \textbf{The Data}\\
 
-The data I use in this project is a dataset from a research collaboration of Worldline and the Machine Learning Group (http://mlg.ulb.ac.be) of ULB (University of Brussels) on big data mining and fraud detection. This was also a popular dataset on Kaggle\footnote{\href{kaggle.com}{kaggle.com}}, for some time.\\
+The data I use in this project is a dataset from a research collaboration of Worldline and the Machine Learning Group (http://mlg.ulb.ac.be) of ULB (University of Brussels) on big data mining and fraud detection. This was also a popular dataset on Kaggle,\footnote{\href{kaggle.com}{kaggle.com}} for some time.\\
 The dataset contains transactions made by credit cards in September 2013 by European cardholders. The time span of transactions is over two days and there are 492 frauds out of 284,807 transactions. This makes the set highly unbalanced, the positive class (frauds) account for 0.172\% of all transactions.
  
 The transactions are in the form of single vectors, with 30 features and the associated class labels (1 or 0). Twenty-eight of these features are results from PCA (Principal Component Analysis) and the other two are Time and Amount. 
@@ -395,7 +396,7 @@ Therefore one of the first steps was to scale the features, which I did using St
 
 \textbf{Feature Engineering}\\
 
-In many machine learning and data science applications, feature engineering is something used to add additional features based on calculations and domain knowledge of the data. In this case, I decided not to do any feature engineering. The data is already post-PCA (Principal Component Analysis), which means information about the features is already lost and so it would be difficult to reason about their effectiveness. Therefore, I just employ algorithms on the original dataset features.
+In many machine learning and data science applications, feature engineering is something used to add additional features based on calculations and domain knowledge of the data. In this case, I decided not to do any feature engineering. The data is already post-PCA (Principal Component Analysis), which means information about the features is already lost and so it would be difficult to reason about their effectiveness. Therefore, I just employ algorithms on the original features of the dataset.
 
 \textbf{Cleaning and Preprocessing}\\
 
@@ -405,7 +406,7 @@ I checked the data to see if any values were missing, or null. This was to ensur
 
 Defining my own cross-validation function early on was a crucial step in this project. As explained briefly in the preparation chapter, the way in which cross-validation is performed is very important to ensure no overfitting occurs. As far as implementation is concerned, the built-in SKLearn cross-validation function does not provide the ability for changing the evaluation metrics or preserving the validity of the sampling. I wanted very specific metrics and the ability to output in a form convenient to me. Also, I needed to resample data in the correct place which meant I needed to define my own function, based on the standard library, which uses Stratified KFold. This essentially means that the splitting of the data in each fold of the KFold procedure contains at least some portion of the underrepresented class. This is important as it would be very common that some folds do not contain any of the minority class. 
 
-The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1}, which simply reports the precision, recall, and f1-score for predicted values. The input is the set of predicted values and the set of true values. The output is the calculated metrics of interest. I use this inside my function to report the metrics we are interested in; something I could not do originally. 
+The function (described by Algorithm~\ref{alg:cross-val}) uses a utility function from SKLearn, \textbf{precision\_recall\_f1}, which simply reports the precision, recall, and f1-score for predicted values. The input is the set of predicted values and the set of true values. The output is the calculated metrics of interest. I use this inside my function to report the metrics we are interested in; something I could not do originally. 
 
 \begin{algorithm}[!htbp]
 \caption{Cross-Validation function }\label{alg:cross-val}
@@ -447,19 +448,19 @@ The function uses a utility function from SKLearn, \textbf{precision\_recall\_f1
 \end{algorithmic}
 \end{algorithm}
 
-This is something I could then use for varying \textbf{Resample} methods, seen on Line 15 of Algorithm~\ref{alg:cross-val}.
+The cross-validation function is something I could then use for varying \textbf{Resample} methods, seen on Line 15 of Algorithm~\ref{alg:cross-val}.
 
 \subsection{Cross Validation the Wrong Way}
 
-\textbf{Test\_Train\_Split vs Custom cross\_val\_score using KFold}\\
-This concerns the underlying approach for the cross-validation loop. SKLearn's test\_train\_split function splits the data into train and test portions. We can then oversample our training data, fit the model, and make predictions using the test set.
+\textbf{SKLearn Test-Train-Split vs Custom Cross-validation using KFold}\\
+The comparison of these approaches for cross-validation, concerns the underlying approach for the cross-validation loop. SKLearn's test\_train\_split function splits the data into train and test portions. We can then oversample our training data, fit the model, and make predictions using the test set.
 One possibility is to simply do this multiple times and average the results.
 I showed in my experiments that this approach will give better results than expected, in comparison with KFold methods. The reason for this is due to the nature of test\_train\_split and its randomness, which introduces a slight bias.
 
 Test\_train\_split allows you to randomly split your data, by giving a parameter that specifies the ratio. However as the split is random, it is likely that there will be overlap in the CV iterations as to which data points are put in the test set. In other words, values selected during one iteration could be selected again during another iteration.
 The consequences of this mean that the model may not be exposed to particular portions of the data whereby it does not generalise well and these are not captured in the results. Also, the way that test\_train\_split operates, does not make maximal use of the data we have.
 
-I ran my classifiers using this approach too, as a means of comparison with what can go wrong and give invalid results. The correct way, as detailed above, uses KFold cross-validation to split the data during a loop and to do any customisations or resampling inside this loop.
+The correct way to handle the problems, as detailed above, is to use KFold cross-validation to split the data during a loop and to do any customisations or resampling inside this loop.
 
 \subsection{Resampling functions}
 To implement resampling functions I made use of the \textbf{imbalanced-learn}\cite{JMLR:v18:16-365} library. This is an API that focused on methods for unbalanced datasets, including oversampling and SMOTE techniques. They have written functions that do exactly what I needed so I made use of their work in this small part of my project. 
@@ -469,7 +470,7 @@ I created simple functions in the form of:\\
 \textbf{Output: X-res, Y-res}\\
 Where X-res and Y-res are the resampled X and Y data. \\
 
-For \textbf{Duplicate Oversampling} I used \textbf{imblearn.over\_sampling.RandomOverSampler.} This does as described Chapter 2. The method randomly selects a data point and duplicates it, or in other words 'selecting random data points, with replacement'.
+For \textbf{Duplicate Oversampling} I used \textbf{imblearn.over\_sampling.RandomOverSampler.}, described Chapter 2. The method randomly selects a data point and duplicates it, or in other words 'selecting random data points, with replacement'.
 For \textbf{SMOTE}, I used \textbf{imblearn.over\_sampling.SMOTE}. The default parameter of k\_neighbors was used, which is a value of 5 and is suitable for this use. 
 For \textbf{Under-Sampling}, I created a small function myself that makes use of NumPy random to randomly select indexes from the majority class, in order to remove data points and bring the ratio down.
 
@@ -607,7 +608,7 @@ Listing~\ref{lst:cnnv2-batchreshape} outlines a function that packs up this tran
 
 Due to the fact that this CNN model specifically exploits the temporal ordering of the transactions, the usual method of cross-validating becomes insufficient. This is because during the usual KFold procedure, the data will be split randomly and of course this will violate temporal ordering. In general, cross-validating for predictive modelling like this is tricky, but there are ways of doing it. I outline one here in my implementation. 
 
-The approach is to split the data as usual (perhaps a 70:30 split), but keeping the temporal ordering such that every transaction after the cutoff point (i.e in the testing set) has a transaction with time $T > T_{n} $, where $T_{n}$ is the last transaction of the training set. When transactions are ordered by time, in the real world we often predict only the next one or two time steps (think of stock market fluctuations). We can use this therefore to average results across the size of the testing set, progressively predicting less test data. 
+The approach is to split the data as usual (perhaps a 70:30 split), but keeping the temporal ordering such that every transaction after the cutoff point (i.e., in the testing set) has a transaction with time $T > T_{n} $, where $T_{n}$ is the last transaction of the training set. When transactions are ordered by time, in the real world we often predict only the next one or two time steps (think of stock market fluctuations). We can use this therefore to average results across the size of the testing set, progressively predicting less test data. 
 
 This can be visualised as follows:
 
