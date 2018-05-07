@@ -10,7 +10,7 @@ def create_model_2():
     conv.add(Dense(100, activation = 'relu'))
     conv.add(Dense(2, activation = 'softmax'))
 
-    sgd = SGD(lr = 0.1, momentum = 0.9, decay = 0, nesterov = False)
+    adam = Adam(lr=0.1)
     
     # Compile model
     conv.compile(loss='categorical_crossentropy', optimizer=sgd)
